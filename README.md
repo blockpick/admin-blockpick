@@ -1,36 +1,133 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BlockPick Admin Dashboard
+
+A modern, clean admin dashboard for the BlockPick platform built with Next.js, TypeScript, and shadcn/ui.
+
+## Features
+
+- Modern UI with shadcn/ui components
+- Type-safe API integration with TypeScript
+- React Query for efficient data fetching and caching
+- Responsive design with Tailwind CSS
+- Dark mode support
+- Comprehensive user, game, and NFT management
+
+## Tech Stack
+
+- **Framework**: Next.js 16 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **UI Components**: shadcn/ui
+- **Data Fetching**: TanStack React Query
+- **Tables**: TanStack React Table
+- **Theme**: next-themes
+- **Icons**: Lucide React
+
+## Project Structure
+
+```
+src/
+├── app/                      # Next.js App Router pages
+│   ├── dashboard/           # Dashboard page
+│   ├── users/               # User management
+│   ├── games/               # Game management
+│   ├── nfts/                # NFT management
+│   └── layout.tsx           # Root layout
+├── components/
+│   ├── ui/                  # shadcn/ui components
+│   ├── layout/              # Layout components (Sidebar, Header)
+│   ├── features/            # Feature-specific components
+│   └── shared/              # Shared/reusable components
+├── lib/
+│   ├── api/                 # API client & service layer
+│   │   ├── client.ts        # Base API client
+│   │   ├── auth.service.ts  # Auth endpoints
+│   │   ├── user.service.ts  # User endpoints
+│   │   ├── game.service.ts  # Game endpoints
+│   │   └── nft.service.ts   # NFT endpoints
+│   ├── hooks/               # Custom React hooks
+│   │   ├── use-auth.ts      # Auth hooks
+│   │   ├── use-users.ts     # User hooks
+│   │   ├── use-games.ts     # Game hooks
+│   │   └── use-nfts.ts      # NFT hooks
+│   ├── types/               # TypeScript type definitions
+│   └── utils.ts             # Utility functions
+└── constants/               # App constants
+```
 
 ## Getting Started
 
-First, run the development server:
+1. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+2. **Set up environment variables**:
+   Create a `.env.local` file in the root directory:
+   ```env
+   NEXT_PUBLIC_API_URL=https://api-dev.blockpick.net
+   ```
+
+3. **Run the development server**:
+   ```bash
+   npm run dev
+   ```
+
+4. **Open your browser**:
+   Navigate to [http://localhost:3000](http://localhost:3000)
+
+## Architecture
+
+### API Service Layer
+
+The application uses a clean service layer architecture:
+
+- **API Client** (`lib/api/client.ts`): Base HTTP client with automatic token management and error handling
+- **Service Files**: Domain-specific API services (auth, users, games, NFTs)
+- **Type Definitions**: Strongly typed request/response interfaces
+
+### Custom Hooks
+
+React Query hooks provide a clean interface for data fetching:
+
+```typescript
+// Example usage
+const { data: users, isLoading } = useUsers({ page: 0, size: 10 });
+const createUser = useCreateUser();
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Reusable Components
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **DataTable**: Generic table component with sorting, filtering, and pagination
+- **StatsCard**: Dashboard statistics cards
+- **PageHeader**: Consistent page headers with actions
+- **LoadingSpinner**: Loading states
+- **EmptyState**: Empty state placeholders
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## API Integration
 
-## Learn More
+The app integrates with the BlockPick API at `https://api-dev.blockpick.net`.
 
-To learn more about Next.js, take a look at the following resources:
+Main endpoints:
+- `/api/auth/*` - Authentication
+- `/api/users/*` - User management
+- `/api/games/*` - Game management
+- `/api/nfts/*` - NFT management
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Scripts
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run dev      # Start development server
+npm run build    # Build for production
+npm start        # Start production server
+npm run lint     # Run ESLint
+```
 
-## Deploy on Vercel
+## Contributing
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Create a feature branch
+2. Make your changes
+3. Submit a pull request
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## License
+
+Private - BlockPick Platform
