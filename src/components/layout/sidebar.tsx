@@ -8,6 +8,7 @@ import {
   Users,
   Gamepad2,
   Package,
+  Link as LinkIcon,
   Settings,
   LogOut,
 } from 'lucide-react';
@@ -34,6 +35,11 @@ const navigation = [
     name: 'Products',
     href: '/products',
     icon: Package,
+  },
+  {
+    name: 'Blockchain',
+    href: '/blockchain',
+    icon: LinkIcon,
   },
   {
     name: 'Settings',
