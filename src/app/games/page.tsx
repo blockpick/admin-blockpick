@@ -151,6 +151,7 @@ const columns: ColumnDef<Game>[] = [
   {
     accessorKey: 'title',
     header: 'Game',
+    enableSorting: true,
     cell: ({ row }) => (
       <div className="flex items-center space-x-3">
         <div className="h-12 w-12 rounded bg-muted overflow-hidden">
@@ -213,6 +214,7 @@ const columns: ColumnDef<Game>[] = [
   },
   {
     id: 'actions',
+    enableSorting: false,
       cell: ({ row }) => {
         const game = row.original as any;
         const gameId = game.id;
@@ -351,6 +353,12 @@ const columns: ColumnDef<Game>[] = [
             data={data?.content || []}
             searchKey="title"
             searchPlaceholder="Search games..."
+            enableServerSidePagination={true}
+            pageCount={data?.totalPages || 0}
+            onPaginationChange={(newPage) => {
+              setPage(newPage);
+            }}
+            initialPageSize={10}
           />
         )}
 

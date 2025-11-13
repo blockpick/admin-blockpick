@@ -167,6 +167,11 @@ const columns: ColumnDef<UserModel>[] = [
     ),
   },
   {
+    accessorKey: 'email',
+    header: 'Email',
+    cell: ({ row }) => row.original.email || '-',
+  },
+  {
     accessorKey: 'name',
     header: 'Name',
       cell: ({ row }) => row.original.name || row.original.nickname || '-',
@@ -202,6 +207,7 @@ const columns: ColumnDef<UserModel>[] = [
   },
   {
     id: 'actions',
+    enableSorting: false,
     cell: ({ row }) => (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -316,6 +322,12 @@ const columns: ColumnDef<UserModel>[] = [
             data={data?.data || []}
             searchKey="email"
             searchPlaceholder="Search users..."
+            enableServerSidePagination={true}
+            pageCount={data?.totalPages || 0}
+            onPaginationChange={(newPage) => {
+              setPage(newPage);
+            }}
+            initialPageSize={10}
           />
         )}
 

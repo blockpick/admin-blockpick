@@ -328,7 +328,12 @@ export default function BlockchainPage() {
               description="배포된 컨트랙트가 없습니다."
             />
           ) : (
-            <DataTable columns={contractColumns} data={contracts} />
+            <DataTable
+              columns={contractColumns}
+              data={contracts}
+              searchKey="gameTitle"
+              searchPlaceholder="게임명으로 검색..."
+            />
           )}
         </div>
 

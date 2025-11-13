@@ -147,6 +147,7 @@ export default function ProductsPage() {
     {
       accessorKey: 'image',
       header: '이미지',
+      enableSorting: false,
       cell: ({ row }) => {
         const product = row.original;
         const imageUrl = product.thumbnailUrl || product.thumbnail || product.imageUrl || product.defaultImage;
@@ -232,6 +233,7 @@ export default function ProductsPage() {
     },
     {
       id: 'actions',
+      enableSorting: false,
       cell: ({ row }) => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -340,6 +342,12 @@ export default function ProductsPage() {
             data={data?.content || []}
             searchKey="name"
             searchPlaceholder="상품 검색..."
+            enableServerSidePagination={true}
+            pageCount={data?.totalPages || 0}
+            onPaginationChange={(newPage) => {
+              setPage(newPage);
+            }}
+            initialPageSize={10}
           />
         )}
 

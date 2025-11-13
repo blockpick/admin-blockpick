@@ -126,32 +126,18 @@ export default function LeaderboardPage() {
             description="아직 참가자가 없습니다."
           />
         ) : (
-          <>
-            <DataTable columns={columns} data={entries} />
-            {totalPages > 1 && (
-              <div className="flex items-center justify-center space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setPage((p) => Math.max(0, p - 1))}
-                  disabled={page === 0}
-                >
-                  이전
-                </Button>
-                <span className="text-sm text-muted-foreground">
-                  {page + 1} / {totalPages}
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
-                  disabled={page >= totalPages - 1}
-                >
-                  다음
-                </Button>
-              </div>
-            )}
-          </>
+          <DataTable
+            columns={columns}
+            data={entries}
+            searchKey="userEmail"
+            searchPlaceholder="이메일로 검색..."
+            enableServerSidePagination={true}
+            pageCount={totalPages}
+            onPaginationChange={(newPage) => {
+              setPage(newPage);
+            }}
+            initialPageSize={20}
+          />
         )}
       </div>
     </AdminLayout>

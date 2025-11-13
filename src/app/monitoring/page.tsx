@@ -257,32 +257,18 @@ export default function MonitoringPage() {
             ) : !logsData || logsData.content.length === 0 ? (
               <EmptyState icon={Activity} title="로그가 없습니다" description="선택한 조건에 맞는 로그가 없습니다." />
             ) : (
-              <>
-                <DataTable columns={logColumns} data={logsData.content} />
-                {logsData.totalPages > 1 && (
-                  <div className="flex items-center justify-center space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setLogPage((p) => Math.max(0, p - 1))}
-                      disabled={logPage === 0}
-                    >
-                      이전
-                    </Button>
-                    <span className="text-sm text-muted-foreground">
-                      {logPage + 1} / {logsData.totalPages}
-                    </span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setLogPage((p) => Math.min(logsData.totalPages - 1, p + 1))}
-                      disabled={logPage >= logsData.totalPages - 1}
-                    >
-                      다음
-                    </Button>
-                  </div>
-                )}
-              </>
+              <DataTable
+                columns={logColumns}
+                data={logsData.content}
+                searchKey="message"
+                searchPlaceholder="로그 메시지로 검색..."
+                enableServerSidePagination={true}
+                pageCount={logsData.totalPages}
+                onPaginationChange={(newPage) => {
+                  setLogPage(newPage);
+                }}
+                initialPageSize={20}
+              />
             )}
           </TabsContent>
 
