@@ -59,11 +59,12 @@ export default function UsersPage() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [startDate, setStartDate] = useState<string | undefined>();
   const [endDate, setEndDate] = useState<string | undefined>();
+  const pageSize = 10;
 
   const { toast } = useToast();
   const { data, isLoading, error } = useUsers({
     page,
-    size: 10,
+    size: pageSize,
     status: statusFilter,
     role: roleFilter,
     search: searchQuery || undefined,
@@ -323,11 +324,11 @@ const columns: ColumnDef<UserModel>[] = [
             searchKey="email"
             searchPlaceholder="Search users..."
             enableServerSidePagination={true}
-            pageCount={data?.totalPages || 0}
+            pageCount={data?.count ? Math.ceil(data.count / pageSize) : 0}
             onPaginationChange={(newPage) => {
               setPage(newPage);
             }}
-            initialPageSize={10}
+            initialPageSize={pageSize}
           />
         )}
 
