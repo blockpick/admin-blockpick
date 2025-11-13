@@ -14,9 +14,10 @@ import { useGame } from '@/lib/hooks/use-games';
 import { gameProductService, blockchainService } from '@/lib/api';
 import { GameStatus, GameType, Currency } from '@/lib/types/game';
 import { formatDistanceToNow } from 'date-fns';
-import { Loader2, Calendar, Coins, Users, Trophy, Link } from 'lucide-react';
+import { Loader2, Calendar, Coins, Users, Trophy, Link, Package } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 
 interface GameDetailDialogProps {
   gameId: string | null;
@@ -44,6 +45,7 @@ export function GameDetailDialog({
   onOpenChange,
   onEdit,
 }: GameDetailDialogProps) {
+  const router = useRouter();
   const { data, isLoading, error } = useGame(gameId || '');
   const [contractInfo, setContractInfo] = useState<any>(null);
   const [loadingContract, setLoadingContract] = useState(false);
@@ -270,11 +272,28 @@ export function GameDetailDialog({
             </div>
 
             {/* 연결된 상품 목록 */}
-            {gameProductsData && gameProductsData.length > 0 && (
-              <>
-                <Separator />
-                <div className="space-y-4">
-                  <h4 className="font-semibold">연결된 상품 ({gameProductsData.length}개)</h4>
+            <Separator />
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h4 className="font-semibold">
+                  연결된 상품 {gameProductsData ? `(${gameProductsData.length}개)` : ''}
+                </h4>
+                {gameId && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      onOpenChange(false);
+                      router.push(`/games/${gameId}/products`);
+                    }}
+                  >
+                    <Package className="mr-2 h-4 w-4" />
+                    상품 관리
+                  </Button>
+                )}
+              </div>
+              {gameProductsData && gameProductsData.length > 0 ? (
+                <>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                     {gameProductsData.slice(0, 6).map((product) => (
                       <div
@@ -306,9 +325,11 @@ export function GameDetailDialog({
                       외 {gameProductsData.length - 6}개의 상품이 더 있습니다.
                     </p>
                   )}
-                </div>
-              </>
-            )}
+                </>
+              ) : (
+                <p className="text-sm text-muted-foreground">연결된 상품이 없습니다.</p>
+              )}
+            </div>
 
             {/* 블록체인 정보 */}
             {(game.onchainContractAddr || contractInfo) && (
