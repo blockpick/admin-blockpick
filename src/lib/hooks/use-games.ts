@@ -120,16 +120,12 @@ export function useUpdateGame() {
 
 /**
  * Hook to delete game
- * Note: This endpoint may not be available in the current API
  */
 export function useDeleteGame() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (id: string) => {
-      // Placeholder - implement when endpoint is available
-      throw new Error('Delete game endpoint not available');
-    },
+    mutationFn: async (id: string) => gameService.deleteGame(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: gameKeys.lists() });
     },
