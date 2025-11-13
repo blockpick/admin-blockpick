@@ -33,6 +33,7 @@ import type { ProductDto } from '@/lib/types/product';
 import { Check, ChevronLeft, ChevronRight, Loader2, ExternalLink, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
+import { DateTimePicker } from '@/components/ui/datetime-picker';
 
 const gameFormSchema = z.object({
   title: z.string().min(1, '게임 제목을 입력해주세요'),
@@ -139,8 +140,13 @@ export function CreateGameDialog({ open, onOpenChange }: CreateGameDialogProps) 
   }, [open, form]);
 
   // 컨트랙트 배포 상태 확인 (주기적으로)
+  // PENDING 또는 DEPLOYING 상태일 때만 폴링 (명시적으로 처리하여 무한 폴링 방지)
   useEffect(() => {
-    if (createdGameId && deployContractEnabled && deploymentStatus !== 'DEPLOYED' && deploymentStatus !== 'FAILED') {
+    if (
+      createdGameId &&
+      deployContractEnabled &&
+      (deploymentStatus === 'PENDING' || deploymentStatus === 'DEPLOYING')
+    ) {
       const interval = setInterval(() => {
         refetchContractInfo();
       }, 5000); // 5초마다 확인
@@ -166,6 +172,11 @@ export function CreateGameDialog({ open, onOpenChange }: CreateGameDialogProps) 
           setDeploymentStatus(status === 'DEPLOYING' ? 'DEPLOYING' : 'PENDING');
         } else if (status === 'FAILED') {
           setDeploymentStatus('FAILED');
+        } else {
+          // 알 수 없는 상태 값이 오면 폴링을 중지하기 위해 null로 설정
+          // 또는 실패로 간주하고 'FAILED'로 설정할 수도 있음
+          console.warn(`Unknown deployment status: ${status}`);
+          setDeploymentStatus('FAILED'); // 안전을 위해 실패로 처리하여 폴링 중지
         }
       }
     }
@@ -542,33 +553,27 @@ export function CreateGameDialog({ open, onOpenChange }: CreateGameDialogProps) 
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="visibleFrom">공개 시작 시간</Label>
-              <Input
-                id="visibleFrom"
-                type="datetime-local"
-                {...form.register('visibleFrom')}
-              />
-            </div>
+            <DateTimePicker
+              id="visibleFrom"
+              label="공개 시작 시간"
+              value={form.watch('visibleFrom')}
+              onChange={(value) => form.setValue('visibleFrom', value)}
+            />
 
-            <div className="space-y-2">
-              <Label htmlFor="startTime">게임 시작 시간</Label>
-              <Input
-                id="startTime"
-                type="datetime-local"
-                {...form.register('startTime')}
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="endTime">게임 종료 시간</Label>
-            <Input
-              id="endTime"
-              type="datetime-local"
-              {...form.register('endTime')}
+            <DateTimePicker
+              id="startTime"
+              label="게임 시작 시간"
+              value={form.watch('startTime')}
+              onChange={(value) => form.setValue('startTime', value)}
             />
           </div>
+
+          <DateTimePicker
+            id="endTime"
+            label="게임 종료 시간"
+            value={form.watch('endTime')}
+            onChange={(value) => form.setValue('endTime', value)}
+          />
 
           <div className="space-y-2">
             <Label htmlFor="customRules">커스텀 규칙</Label>

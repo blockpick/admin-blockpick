@@ -27,6 +27,7 @@ import { useUpdateGame, useGame } from '@/lib/hooks/use-games';
 import { useToast } from '@/hooks/use-toast';
 import type { GameType, Currency, GameStatusType } from '@/lib/types/game';
 import { Loader2 } from 'lucide-react';
+import { DateTimePicker } from '@/components/ui/datetime-picker';
 
 const gameFormSchema = z.object({
   title: z.string().min(1, '게임 제목을 입력해주세요'),
@@ -100,16 +101,16 @@ export function EditGameDialog({ gameId, open, onOpenChange }: EditGameDialogPro
   useEffect(() => {
     if (gameData && open) {
       const game = gameData;
-      // datetime-local 형식으로 변환
-      const formatDateTimeLocal = (dateString?: string) => {
+      // ISO 형식으로 변환 (DateTimePicker가 ISO 형식을 사용)
+      const formatDateTimeISO = (dateString?: string) => {
         if (!dateString) return '';
-        const date = new Date(dateString);
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        const hours = String(date.getHours()).padStart(2, '0');
-        const minutes = String(date.getMinutes()).padStart(2, '0');
-        return `${year}-${month}-${day}T${hours}:${minutes}`;
+        try {
+          const date = new Date(dateString);
+          if (isNaN(date.getTime())) return '';
+          return date.toISOString();
+        } catch {
+          return '';
+        }
       };
 
       form.reset({
@@ -127,9 +128,9 @@ export function EditGameDialog({ gameId, open, onOpenChange }: EditGameDialogPro
         rewardPoint: game.rewardPoint,
         gridRows: game.gridRows,
         gridCols: game.gridCols,
-        visibleFrom: formatDateTimeLocal(game.visibleFrom),
-        startTime: formatDateTimeLocal(game.startTime),
-        endTime: formatDateTimeLocal(game.endTime),
+        visibleFrom: formatDateTimeISO(game.visibleFrom),
+        startTime: formatDateTimeISO(game.startTime),
+        endTime: formatDateTimeISO(game.endTime),
         allowDuplicate: game.allowDuplicate || false,
         enableNotification: game.enableNotification ?? true,
         isRecommended: game.isRecommended || false,
@@ -400,33 +401,27 @@ export function EditGameDialog({ gameId, open, onOpenChange }: EditGameDialogPro
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="visibleFrom">공개 시작 시간</Label>
-              <Input
-                id="visibleFrom"
-                type="datetime-local"
-                {...form.register('visibleFrom')}
-              />
-            </div>
+            <DateTimePicker
+              id="visibleFrom"
+              label="공개 시작 시간"
+              value={form.watch('visibleFrom')}
+              onChange={(value) => form.setValue('visibleFrom', value)}
+            />
 
-            <div className="space-y-2">
-              <Label htmlFor="startTime">게임 시작 시간</Label>
-              <Input
-                id="startTime"
-                type="datetime-local"
-                {...form.register('startTime')}
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="endTime">게임 종료 시간</Label>
-            <Input
-              id="endTime"
-              type="datetime-local"
-              {...form.register('endTime')}
+            <DateTimePicker
+              id="startTime"
+              label="게임 시작 시간"
+              value={form.watch('startTime')}
+              onChange={(value) => form.setValue('startTime', value)}
             />
           </div>
+
+          <DateTimePicker
+            id="endTime"
+            label="게임 종료 시간"
+            value={form.watch('endTime')}
+            onChange={(value) => form.setValue('endTime', value)}
+          />
 
           <div className="space-y-2">
             <Label htmlFor="customRules">커스텀 규칙</Label>
