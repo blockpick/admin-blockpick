@@ -47,16 +47,16 @@ export default function MonitoringPage() {
   const [metricsPeriod, setMetricsPeriod] = useState<'day' | 'week' | 'month'>('day');
   const { toast } = useToast();
 
-  const { data: healthData, isLoading: healthLoading } = useSystemHealth();
-  const { data: txStatusData, isLoading: txLoading } = useTransactionStatus();
-  const { data: eventStatusData, isLoading: eventLoading } = useEventStatus();
-  const { data: logsData, isLoading: logsLoading } = useLogs({
+  const { data: healthData, isLoading: healthLoading, error: healthError } = useSystemHealth();
+  const { data: txStatusData, isLoading: txLoading, error: txError } = useTransactionStatus();
+  const { data: eventStatusData, isLoading: eventLoading, error: eventError } = useEventStatus();
+  const { data: logsData, isLoading: logsLoading, error: logsError } = useLogs({
     level: logLevel || undefined,
     service: logService || undefined,
     page: logPage,
     size: 20,
   });
-  const { data: metricsData, isLoading: metricsLoading } = useMetrics({
+  const { data: metricsData, isLoading: metricsLoading, error: metricsError } = useMetrics({
     interval: metricsPeriod,
   });
   const retryEvent = useRetryEvent();
@@ -134,21 +134,21 @@ export default function MonitoringPage() {
   ];
 
   // Transform metrics data for charts
-  const cpuChartData = metricsData?.cpu
+  const cpuChartData = metricsError ? undefined : metricsData?.cpu
     ? {
         labels: metricsData.cpu.map((d) => format(new Date(d.timestamp), 'HH:mm', { locale: ko })),
         datasets: [{ label: 'CPU 사용률 (%)', data: metricsData.cpu.map((d) => d.value) }],
       }
     : undefined;
 
-  const memoryChartData = metricsData?.memory
+  const memoryChartData = metricsError ? undefined : metricsData?.memory
     ? {
         labels: metricsData.memory.map((d) => format(new Date(d.timestamp), 'HH:mm', { locale: ko })),
         datasets: [{ label: '메모리 사용률 (%)', data: metricsData.memory.map((d) => d.value) }],
       }
     : undefined;
 
-  const requestsChartData = metricsData?.requests
+  const requestsChartData = metricsError ? undefined : metricsData?.requests
     ? {
         labels: metricsData.requests.map((d) => format(new Date(d.timestamp), 'HH:mm', { locale: ko })),
         datasets: [{ label: '요청 수', data: metricsData.requests.map((d) => d.count) }],
@@ -164,7 +164,7 @@ export default function MonitoringPage() {
         />
 
         {/* Health Status Cards */}
-        {healthData && (
+        {healthData && !healthError ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <StatsCard
               title="시스템 상태"
@@ -174,24 +174,30 @@ export default function MonitoringPage() {
             />
             <StatsCard
               title="미발행 이벤트"
-              value={healthData.metrics.unpublishedEvents}
+              value={healthData.metrics?.unpublishedEvents || 0}
               icon={Activity}
               description="대기 중인 이벤트"
             />
             <StatsCard
               title="대기 중 트랜잭션"
-              value={healthData.metrics.pendingTransactions}
+              value={healthData.metrics?.pendingTransactions || 0}
               icon={Clock}
               description="처리 대기 중"
             />
             <StatsCard
               title="실패한 트랜잭션"
-              value={healthData.metrics.failedTransactions}
+              value={healthData.metrics?.failedTransactions || 0}
               icon={XCircle}
               description="처리 실패"
             />
           </div>
-        )}
+        ) : healthError ? (
+          <div className="rounded-lg border border-red-500 bg-red-50 p-4 dark:bg-red-950">
+            <p className="text-sm font-medium text-red-800 dark:text-red-200">
+              시스템 상태를 불러올 수 없습니다. 서버 오류가 발생했습니다.
+            </p>
+          </div>
+        ) : null}
 
         <Tabs defaultValue="logs" className="space-y-4">
           <TabsList>
@@ -246,6 +252,8 @@ export default function MonitoringPage() {
 
             {logsLoading ? (
               <LoadingSpinner />
+            ) : logsError ? (
+              <EmptyState icon={AlertCircle} title="로그를 불러올 수 없습니다" description="서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요." />
             ) : !logsData || logsData.content.length === 0 ? (
               <EmptyState icon={Activity} title="로그가 없습니다" description="선택한 조건에 맞는 로그가 없습니다." />
             ) : (
@@ -320,6 +328,8 @@ export default function MonitoringPage() {
           <TabsContent value="events" className="space-y-4">
             {eventLoading ? (
               <LoadingSpinner />
+            ) : eventError ? (
+              <EmptyState icon={AlertCircle} title="이벤트 데이터를 불러올 수 없습니다" description="서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요." />
             ) : eventStatusData ? (
               <div className="space-y-4">
                 <StatsCard
@@ -366,6 +376,8 @@ export default function MonitoringPage() {
           <TabsContent value="transactions" className="space-y-4">
             {txLoading ? (
               <LoadingSpinner />
+            ) : txError ? (
+              <EmptyState icon={AlertCircle} title="트랜잭션 데이터를 불러올 수 없습니다" description="서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요." />
             ) : txStatusData ? (
               <div className="space-y-4">
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

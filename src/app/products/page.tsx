@@ -57,27 +57,44 @@ export default function ProductsPage() {
     active: activeFilter,
     search: searchQuery || undefined,
   });
-  const { data: statsData, isLoading: statsLoading } = useProductStats();
+  const { data: statsData, isLoading: statsLoading, error: statsError } = useProductStats();
   const deleteProduct = useDeleteProduct();
 
   // 브랜드 및 카테고리 목록 로드
   useEffect(() => {
     const loadFilters = async () => {
       try {
-        const [brandsData, categoriesData] = await Promise.all([
-          productService.getProducts({ page: 0, size: 1000 }).then((res) => {
-            const uniqueBrands = new Set<string>();
-            res.content.forEach((p) => {
-              if (p.brand) uniqueBrands.add(p.brand);
-            });
-            return Array.from(uniqueBrands);
+        // 브랜드 목록은 현재 페이지의 상품에서 추출 (점진적으로 로드)
+        // 카테고리만 별도 API로 로드
+        const [productsData, categoriesData] = await Promise.all([
+          productService.getProducts({ page: 0, size: 100 }).catch((err) => {
+            console.warn('Failed to load products for brand filter:', err);
+            return null;
           }),
-          productService.getCategories().then((cats) => cats || []),
+          productService.getCategories().catch((err) => {
+            // 400 에러는 API가 아직 구현되지 않았을 수 있으므로 경고만 출력
+            console.warn('Failed to load categories (API may not be implemented):', err);
+            return [];
+          }),
         ]);
-        setBrands(brandsData);
-        setCategories(categoriesData);
+
+        if (productsData?.content) {
+          const uniqueBrands = new Set<string>();
+          productsData.content.forEach((p) => {
+            if (p.brand) uniqueBrands.add(p.brand);
+          });
+          setBrands(Array.from(uniqueBrands));
+        }
+
+        if (categoriesData && Array.isArray(categoriesData)) {
+          setCategories(categoriesData);
+        }
       } catch (error) {
         console.error('Failed to load filters:', error);
+        // 필터 로딩 실패는 페이지 전체에 영향을 주지 않도록 함
+        // 빈 배열로 초기화하여 UI가 정상 작동하도록 함
+        setBrands([]);
+        setCategories([]);
       }
     };
     loadFilters();
@@ -186,7 +203,7 @@ export default function ProductsPage() {
       header: '가격',
       cell: ({ row }) => {
         const product = row.original;
-        if (product.price !== undefined) {
+        if (product.price !== undefined && product.price !== null && typeof product.price === 'number') {
           return `${product.price.toLocaleString()} ${product.countryCode || 'KRW'}`;
         }
         return '-';
@@ -255,7 +272,7 @@ export default function ProductsPage() {
         />
 
         {/* 통계 카드 */}
-        {!statsLoading && statsData && (
+        {!statsLoading && statsData && !statsError && (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <StatsCard
               title="총 상품 수"

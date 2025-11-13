@@ -63,6 +63,16 @@ export function useProductStats() {
     queryKey: productKeys.stats(),
     queryFn: () => productService.getProductStats(),
     enabled: shouldEnableQuery(),
+    retry: (failureCount, error) => {
+      // 400 에러는 재시도하지 않음 (잘못된 요청이므로)
+      if (error && typeof error === 'object' && 'status' in error) {
+        const status = (error as { status: number }).status;
+        if (status === 400) {
+          return false;
+        }
+      }
+      return failureCount < 2;
+    },
   });
 }
 

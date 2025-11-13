@@ -22,16 +22,16 @@ export default function DashboardPage() {
   const { users, totalGames, activeGames, totalProducts, isLoading: statsLoading } = useDashboardStats();
   const { data: recentGamesData, isLoading: gamesLoading } = useRecentGames(5);
   const { data: recentUsersData, isLoading: usersLoading } = useRecentUsers(5);
-  const { data: systemHealth, isLoading: healthLoading } = useSystemHealth();
+  const { data: systemHealth, isLoading: healthLoading, error: healthError } = useSystemHealth();
 
   // Chart data
-  const { data: usersChartData, isLoading: usersChartLoading } = useChartData('users', { period: chartPeriod });
-  const { data: gamesChartData, isLoading: gamesChartLoading } = useChartData('games', { period: chartPeriod });
-  const { data: revenueChartData, isLoading: revenueChartLoading } = useChartData('revenue', { period: chartPeriod });
-  const { data: productsChartData, isLoading: productsChartLoading } = useChartData('products', { period: chartPeriod });
+  const { data: usersChartData, isLoading: usersChartLoading, error: usersChartError } = useChartData('users', { period: chartPeriod });
+  const { data: gamesChartData, isLoading: gamesChartLoading, error: gamesChartError } = useChartData('games', { period: chartPeriod });
+  const { data: revenueChartData, isLoading: revenueChartLoading, error: revenueChartError } = useChartData('revenue', { period: chartPeriod });
+  const { data: productsChartData, isLoading: productsChartLoading, error: productsChartError } = useChartData('products', { period: chartPeriod });
 
   // Activities
-  const { data: activitiesData, isLoading: activitiesLoading } = useRecentActivities(10);
+  const { data: activitiesData, isLoading: activitiesLoading, error: activitiesError } = useRecentActivities(10);
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return 'N/A';
@@ -101,14 +101,14 @@ export default function DashboardPage() {
           />
           <StatsCard
             title="시스템 상태"
-            value={systemHealth?.status === 'UP' ? '정상' : '점검중'}
-            icon={systemHealth?.status === 'UP' ? CheckCircle2 : AlertCircle}
-            description={systemHealth?.status === 'UP' ? '모든 시스템 정상' : '일부 시스템 점검 중'}
+            value={healthError ? '오류' : systemHealth?.status === 'UP' ? '정상' : '점검중'}
+            icon={healthError ? AlertCircle : systemHealth?.status === 'UP' ? CheckCircle2 : AlertCircle}
+            description={healthError ? '시스템 상태를 불러올 수 없습니다' : systemHealth?.status === 'UP' ? '모든 시스템 정상' : '일부 시스템 점검 중'}
           />
         </div>
 
         {/* System Health Alert */}
-        {systemHealth && systemHealth.alerts.length > 0 && (
+        {systemHealth && !healthError && systemHealth.alerts && systemHealth.alerts.length > 0 && (
           <Card className="border-yellow-500">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -135,7 +135,7 @@ export default function DashboardPage() {
         )}
 
         {/* System Metrics */}
-        {systemHealth && (
+        {systemHealth && !healthError && systemHealth.metrics && (
           <Card>
             <CardHeader>
               <CardTitle>시스템 메트릭</CardTitle>
@@ -169,7 +169,7 @@ export default function DashboardPage() {
           <ChartCard
             title="사용자 가입 추이"
             description="기간별 신규 사용자 가입 현황"
-            data={usersChartData}
+            data={usersChartError ? undefined : usersChartData}
             isLoading={usersChartLoading}
             period={chartPeriod}
             onPeriodChange={setChartPeriod}
@@ -177,7 +177,7 @@ export default function DashboardPage() {
           <ChartCard
             title="게임 생성 추이"
             description="기간별 게임 생성 현황"
-            data={gamesChartData}
+            data={gamesChartError ? undefined : gamesChartData}
             isLoading={gamesChartLoading}
             period={chartPeriod}
             onPeriodChange={setChartPeriod}
@@ -185,7 +185,7 @@ export default function DashboardPage() {
           <ChartCard
             title="수익 추이"
             description="기간별 수익 현황"
-            data={revenueChartData}
+            data={revenueChartError ? undefined : revenueChartData}
             isLoading={revenueChartLoading}
             period={chartPeriod}
             onPeriodChange={setChartPeriod}
@@ -193,7 +193,7 @@ export default function DashboardPage() {
           <ChartCard
             title="상품 등록 추이"
             description="기간별 상품 등록 현황"
-            data={productsChartData}
+            data={productsChartError ? undefined : productsChartData}
             isLoading={productsChartLoading}
             period={chartPeriod}
             onPeriodChange={setChartPeriod}
@@ -203,7 +203,7 @@ export default function DashboardPage() {
         {/* Activities and Recent Items Grid */}
         <div className="grid gap-4 md:grid-cols-2">
           <ActivityTimeline
-            activities={activitiesData}
+            activities={activitiesError ? undefined : activitiesData}
             isLoading={activitiesLoading}
             limit={10}
           />

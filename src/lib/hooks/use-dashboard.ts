@@ -110,6 +110,16 @@ export function useSystemHealth() {
     queryFn: () => monitoringService.getHealthStatus(),
     enabled: shouldEnableQuery(),
     refetchInterval: 30000, // Refetch every 30 seconds
+    retry: (failureCount, error) => {
+      // 500 에러는 서버 문제이므로 재시도하지 않음
+      if (error && typeof error === 'object' && 'status' in error) {
+        const status = (error as { status: number }).status;
+        if (status >= 500) {
+          return false;
+        }
+      }
+      return failureCount < 2;
+    },
   });
 }
 
@@ -128,6 +138,16 @@ export function useChartData(
     queryKey: [...dashboardKeys.charts(), type, params],
     queryFn: () => dashboardService.getChartData(type, params),
     enabled: shouldEnableQuery(),
+    retry: (failureCount, error) => {
+      // 500 에러는 서버 문제이므로 재시도하지 않음
+      if (error && typeof error === 'object' && 'status' in error) {
+        const status = (error as { status: number }).status;
+        if (status >= 500) {
+          return false;
+        }
+      }
+      return failureCount < 2;
+    },
   });
 }
 
@@ -139,6 +159,16 @@ export function useRecentActivities(limit: number = 20) {
     queryKey: [...dashboardKeys.activities(), limit],
     queryFn: () => dashboardService.getRecentActivities({ limit }),
     enabled: shouldEnableQuery(),
+    retry: (failureCount, error) => {
+      // 500 에러는 서버 문제이므로 재시도하지 않음
+      if (error && typeof error === 'object' && 'status' in error) {
+        const status = (error as { status: number }).status;
+        if (status >= 500) {
+          return false;
+        }
+      }
+      return failureCount < 2;
+    },
   });
 }
 

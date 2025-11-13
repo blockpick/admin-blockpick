@@ -38,6 +38,16 @@ export function useSystemHealth() {
     queryFn: () => monitoringService.getHealthStatus(),
     enabled: shouldEnableQuery(),
     refetchInterval: 30000, // Refresh every 30 seconds
+    retry: (failureCount, error) => {
+      // 500 에러는 서버 문제이므로 재시도하지 않음
+      if (error && typeof error === 'object' && 'status' in error) {
+        const status = (error as { status: number }).status;
+        if (status >= 500) {
+          return false;
+        }
+      }
+      return failureCount < 2;
+    },
   });
 }
 
@@ -50,6 +60,16 @@ export function useTransactionStatus() {
     queryFn: () => monitoringService.getTransactionStatus(),
     enabled: shouldEnableQuery(),
     refetchInterval: 30000,
+    retry: (failureCount, error) => {
+      // 500 에러는 서버 문제이므로 재시도하지 않음
+      if (error && typeof error === 'object' && 'status' in error) {
+        const status = (error as { status: number }).status;
+        if (status >= 500) {
+          return false;
+        }
+      }
+      return failureCount < 2;
+    },
   });
 }
 
@@ -62,6 +82,16 @@ export function useEventStatus() {
     queryFn: () => monitoringService.getEventStatus(),
     enabled: shouldEnableQuery(),
     refetchInterval: 30000,
+    retry: (failureCount, error) => {
+      // 500 에러는 서버 문제이므로 재시도하지 않음
+      if (error && typeof error === 'object' && 'status' in error) {
+        const status = (error as { status: number }).status;
+        if (status >= 500) {
+          return false;
+        }
+      }
+      return failureCount < 2;
+    },
   });
 }
 
@@ -80,6 +110,16 @@ export function useLogs(params?: {
     queryKey: monitoringKeys.logs(params),
     queryFn: () => monitoringService.getLogs(params),
     enabled: shouldEnableQuery(),
+    retry: (failureCount, error) => {
+      // 500 에러는 서버 문제이므로 재시도하지 않음
+      if (error && typeof error === 'object' && 'status' in error) {
+        const status = (error as { status: number }).status;
+        if (status >= 500) {
+          return false;
+        }
+      }
+      return failureCount < 2;
+    },
   });
 }
 
@@ -95,6 +135,16 @@ export function useMetrics(params?: {
     queryKey: monitoringKeys.metrics(params),
     queryFn: () => monitoringService.getMetrics(params),
     enabled: shouldEnableQuery(),
+    retry: (failureCount, error) => {
+      // 500 에러는 서버 문제이므로 재시도하지 않음
+      if (error && typeof error === 'object' && 'status' in error) {
+        const status = (error as { status: number }).status;
+        if (status >= 500) {
+          return false;
+        }
+      }
+      return failureCount < 2;
+    },
   });
 }
 
