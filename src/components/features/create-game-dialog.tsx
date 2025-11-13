@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { DateTimePicker } from '@/components/ui/datetime-picker';
 import {
   Dialog,
   DialogContent,
@@ -12,7 +12,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -23,17 +22,17 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { useToast } from '@/hooks/use-toast';
+import { gameProductService } from '@/lib/api';
+import { useContractInfo } from '@/lib/hooks/use-blockchain';
 import { useCreateGame } from '@/lib/hooks/use-games';
 import { useProducts } from '@/lib/hooks/use-products';
-import { useContractInfo } from '@/lib/hooks/use-blockchain';
-import { gameProductService } from '@/lib/api';
-import { useToast } from '@/hooks/use-toast';
-import type { GameType, Currency } from '@/lib/types/game';
-import type { ProductDto } from '@/lib/types/product';
-import { Check, ChevronLeft, ChevronRight, Loader2, ExternalLink, AlertCircle } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
-import { DateTimePicker } from '@/components/ui/datetime-picker';
+import type { Currency, GameType } from '@/lib/types/game';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { AlertCircle, Check, ChevronLeft, ChevronRight, ExternalLink, Loader2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
 
 const gameFormSchema = z.object({
   title: z.string().min(1, '게임 제목을 입력해주세요'),
@@ -164,21 +163,28 @@ export function CreateGameDialog({ open, onOpenChange }: CreateGameDialogProps) 
       if (contractInfo.contractAddress) {
         setContractAddress(contractInfo.contractAddress);
       }
-      if (contractInfo.status) {
-        const status = contractInfo.status.toUpperCase();
+      // status가 있는 경우에만 처리 (명시적으로 체크하여 무한 폴링 방지)
+      if (contractInfo.status && typeof contractInfo.status === 'string') {
+        const status = contractInfo.status.trim().toUpperCase();
+
+        // 알려진 상태 값 처리
         if (status === 'DEPLOYED') {
           setDeploymentStatus('DEPLOYED');
-        } else if (status === 'DEPLOYING' || status === 'PENDING') {
-          setDeploymentStatus(status === 'DEPLOYING' ? 'DEPLOYING' : 'PENDING');
+        } else if (status === 'DEPLOYING') {
+          setDeploymentStatus('DEPLOYING');
+        } else if (status === 'PENDING') {
+          setDeploymentStatus('PENDING');
         } else if (status === 'FAILED') {
           setDeploymentStatus('FAILED');
         } else {
-          // 알 수 없는 상태 값이 오면 폴링을 중지하기 위해 null로 설정
-          // 또는 실패로 간주하고 'FAILED'로 설정할 수도 있음
-          console.warn(`Unknown deployment status: ${status}`);
-          setDeploymentStatus('FAILED'); // 안전을 위해 실패로 처리하여 폴링 중지
+          // 알 수 없는 상태 값이 오면 폴링을 중지하기 위해 'FAILED'로 설정
+          // 이렇게 하면 폴링 조건에서 제외되어 무한 폴링이 방지됨
+          console.warn(`Unknown deployment status: ${status}. Treating as FAILED to stop polling.`);
+          setDeploymentStatus('FAILED');
         }
       }
+      // status가 없거나 빈 문자열인 경우는 처리하지 않음 (이전 상태 유지)
+      // 이는 아직 배포 정보가 없거나 로딩 중일 수 있기 때문
     }
   }, [contractInfo]);
 
