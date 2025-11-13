@@ -7,6 +7,7 @@ import { userService } from '../api';
 import { gameService } from '../api';
 import { productService } from '../api';
 import { monitoringService } from '../api';
+import { dashboardService } from '../api/dashboard';
 import { shouldEnableQuery } from './query-utils';
 
 /**
@@ -18,6 +19,8 @@ export const dashboardKeys = {
   recentGames: () => [...dashboardKeys.all, 'recentGames'] as const,
   recentUsers: () => [...dashboardKeys.all, 'recentUsers'] as const,
   systemHealth: () => [...dashboardKeys.all, 'systemHealth'] as const,
+  charts: () => [...dashboardKeys.all, 'charts'] as const,
+  activities: () => [...dashboardKeys.all, 'activities'] as const,
 };
 
 /**
@@ -107,6 +110,35 @@ export function useSystemHealth() {
     queryFn: () => monitoringService.getHealthStatus(),
     enabled: shouldEnableQuery(),
     refetchInterval: 30000, // Refetch every 30 seconds
+  });
+}
+
+/**
+ * Hook to get chart data
+ */
+export function useChartData(
+  type: 'users' | 'games' | 'revenue' | 'products',
+  params?: {
+    period?: 'day' | 'week' | 'month' | 'year';
+    startDate?: string;
+    endDate?: string;
+  }
+) {
+  return useQuery({
+    queryKey: [...dashboardKeys.charts(), type, params],
+    queryFn: () => dashboardService.getChartData(type, params),
+    enabled: shouldEnableQuery(),
+  });
+}
+
+/**
+ * Hook to get recent activities
+ */
+export function useRecentActivities(limit: number = 20) {
+  return useQuery({
+    queryKey: [...dashboardKeys.activities(), limit],
+    queryFn: () => dashboardService.getRecentActivities({ limit }),
+    enabled: shouldEnableQuery(),
   });
 }
 

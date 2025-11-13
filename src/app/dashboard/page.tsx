@@ -1,23 +1,37 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AdminLayout } from '@/components/layout/admin-layout';
 import { PageHeader } from '@/components/shared/page-header';
 import { StatsCard } from '@/components/shared/stats-card';
 import { LoadingSpinner } from '@/components/shared/loading-spinner';
+import { ChartCard } from '@/components/shared/chart-card';
+import { ActivityTimeline } from '@/components/shared/activity-timeline';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Users, Gamepad2, Package, Activity, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { useDashboardStats, useRecentGames, useRecentUsers, useSystemHealth } from '@/lib/hooks/use-dashboard';
+import { useDashboardStats, useRecentGames, useRecentUsers, useSystemHealth, useChartData, useRecentActivities } from '@/lib/hooks/use-dashboard';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function DashboardPage() {
   const router = useRouter();
+  const [chartPeriod, setChartPeriod] = useState<'day' | 'week' | 'month' | 'year'>('month');
+
   const { users, totalGames, activeGames, totalProducts, isLoading: statsLoading } = useDashboardStats();
   const { data: recentGamesData, isLoading: gamesLoading } = useRecentGames(5);
   const { data: recentUsersData, isLoading: usersLoading } = useRecentUsers(5);
   const { data: systemHealth, isLoading: healthLoading } = useSystemHealth();
+
+  // Chart data
+  const { data: usersChartData, isLoading: usersChartLoading } = useChartData('users', { period: chartPeriod });
+  const { data: gamesChartData, isLoading: gamesChartLoading } = useChartData('games', { period: chartPeriod });
+  const { data: revenueChartData, isLoading: revenueChartLoading } = useChartData('revenue', { period: chartPeriod });
+  const { data: productsChartData, isLoading: productsChartLoading } = useChartData('products', { period: chartPeriod });
+
+  // Activities
+  const { data: activitiesData, isLoading: activitiesLoading } = useRecentActivities(10);
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return 'N/A';
@@ -152,6 +166,48 @@ export default function DashboardPage() {
 
         {/* Charts Grid */}
         <div className="grid gap-4 md:grid-cols-2">
+          <ChartCard
+            title="사용자 가입 추이"
+            description="기간별 신규 사용자 가입 현황"
+            data={usersChartData}
+            isLoading={usersChartLoading}
+            period={chartPeriod}
+            onPeriodChange={setChartPeriod}
+          />
+          <ChartCard
+            title="게임 생성 추이"
+            description="기간별 게임 생성 현황"
+            data={gamesChartData}
+            isLoading={gamesChartLoading}
+            period={chartPeriod}
+            onPeriodChange={setChartPeriod}
+          />
+          <ChartCard
+            title="수익 추이"
+            description="기간별 수익 현황"
+            data={revenueChartData}
+            isLoading={revenueChartLoading}
+            period={chartPeriod}
+            onPeriodChange={setChartPeriod}
+          />
+          <ChartCard
+            title="상품 등록 추이"
+            description="기간별 상품 등록 현황"
+            data={productsChartData}
+            isLoading={productsChartLoading}
+            period={chartPeriod}
+            onPeriodChange={setChartPeriod}
+          />
+        </div>
+
+        {/* Activities and Recent Items Grid */}
+        <div className="grid gap-4 md:grid-cols-2">
+          <ActivityTimeline
+            activities={activitiesData}
+            isLoading={activitiesLoading}
+            limit={10}
+          />
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
@@ -199,59 +255,60 @@ export default function DashboardPage() {
               )}
             </CardContent>
           </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle>최근 사용자</CardTitle>
-                <CardDescription>최근 가입한 사용자 목록</CardDescription>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => router.push('/users')}
-              >
-                전체 보기
-              </Button>
-            </CardHeader>
-            <CardContent>
-              {usersLoading ? (
-                <LoadingSpinner />
-              ) : recentUsersData && recentUsersData.length > 0 ? (
-                <div className="space-y-4">
-                  {recentUsersData.map((user) => (
-                    <div
-                      key={user.id}
-                      className="flex items-center justify-between cursor-pointer hover:bg-muted/50 p-2 rounded-lg transition-colors"
-                      onClick={() => router.push(`/users`)}
-                    >
-                      <div className="flex items-center space-x-4 flex-1">
-                        <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
-                          {(user.nickname || user.email || 'U').charAt(0).toUpperCase()}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">
-                            {user.nickname || user.email}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {user.email} • {formatDate(user.createdAt)}
-                          </p>
-                        </div>
-                      </div>
-                      <Badge variant="outline" className="ml-2">
-                        {user.userRole}
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  사용자가 없습니다
-                </p>
-              )}
-            </CardContent>
-          </Card>
         </div>
+
+        {/* Recent Users */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>최근 사용자</CardTitle>
+              <CardDescription>최근 가입한 사용자 목록</CardDescription>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => router.push('/users')}
+            >
+              전체 보기
+            </Button>
+          </CardHeader>
+          <CardContent>
+            {usersLoading ? (
+              <LoadingSpinner />
+            ) : recentUsersData && recentUsersData.length > 0 ? (
+              <div className="space-y-4">
+                {recentUsersData.map((user) => (
+                  <div
+                    key={user.id}
+                    className="flex items-center justify-between cursor-pointer hover:bg-muted/50 p-2 rounded-lg transition-colors"
+                    onClick={() => router.push(`/users`)}
+                  >
+                    <div className="flex items-center space-x-4 flex-1">
+                      <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+                        {(user.nickname || user.email || 'U').charAt(0).toUpperCase()}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">
+                          {user.nickname || user.email}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {user.email} • {formatDate(user.createdAt)}
+                        </p>
+                      </div>
+                    </div>
+                    <Badge variant="outline" className="ml-2">
+                      {user.userRole}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                사용자가 없습니다
+              </p>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </AdminLayout>
   );

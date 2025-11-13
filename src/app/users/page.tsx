@@ -146,70 +146,70 @@ export default function UsersPage() {
     setSearchQuery('');
     setStartDate(undefined);
     setEndDate(undefined);
-  };
+};
 
-  const columns: ColumnDef<UserModel>[] = [
-    {
-      accessorKey: 'username',
-      header: 'Username',
-      cell: ({ row }) => (
-        <div className="flex items-center space-x-3">
-          <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+const columns: ColumnDef<UserModel>[] = [
+  {
+    accessorKey: 'username',
+    header: 'Username',
+    cell: ({ row }) => (
+      <div className="flex items-center space-x-3">
+        <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
             {(row.original.name || row.original.nickname || row.original.email || 'U')
               .charAt(0)
               .toUpperCase()}
-          </div>
-          <div>
-            <div className="font-medium">{row.original.username || row.original.email}</div>
-            <div className="text-sm text-muted-foreground">{row.original.email}</div>
-          </div>
         </div>
-      ),
-    },
-    {
-      accessorKey: 'name',
-      header: 'Name',
+        <div>
+            <div className="font-medium">{row.original.username || row.original.email}</div>
+          <div className="text-sm text-muted-foreground">{row.original.email}</div>
+        </div>
+      </div>
+    ),
+  },
+  {
+    accessorKey: 'name',
+    header: 'Name',
       cell: ({ row }) => row.original.name || row.original.nickname || '-',
+  },
+  {
+    accessorKey: 'role',
+    header: 'Role',
+    cell: ({ row }) => (
+      <Badge variant="outline">{row.original.userRole || 'USER'}</Badge>
+    ),
+  },
+  {
+    accessorKey: 'status',
+    header: 'Status',
+    cell: ({ row }) => {
+      const status = row.original.status || 'ACTIVE';
+      return (
+        <div className="flex items-center space-x-2">
+          <div className={`h-2 w-2 rounded-full ${statusColors[status] || 'bg-gray-400'}`} />
+          <span className="capitalize">{status.toLowerCase()}</span>
+        </div>
+      );
     },
-    {
-      accessorKey: 'role',
-      header: 'Role',
-      cell: ({ row }) => (
-        <Badge variant="outline">{row.original.userRole || 'USER'}</Badge>
-      ),
-    },
-    {
-      accessorKey: 'status',
-      header: 'Status',
-      cell: ({ row }) => {
-        const status = row.original.status || 'ACTIVE';
-        return (
-          <div className="flex items-center space-x-2">
-            <div className={`h-2 w-2 rounded-full ${statusColors[status] || 'bg-gray-400'}`} />
-            <span className="capitalize">{status.toLowerCase()}</span>
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: 'createdAt',
-      header: 'Joined',
-      cell: ({ row }) => (
-        <span className="text-sm text-muted-foreground">
-          {formatDistanceToNow(new Date(row.original.createdAt), { addSuffix: true })}
-        </span>
-      ),
-    },
-    {
-      id: 'actions',
-      cell: ({ row }) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+  },
+  {
+    accessorKey: 'createdAt',
+    header: 'Joined',
+    cell: ({ row }) => (
+      <span className="text-sm text-muted-foreground">
+        {formatDistanceToNow(new Date(row.original.createdAt), { addSuffix: true })}
+      </span>
+    ),
+  },
+  {
+    id: 'actions',
+    cell: ({ row }) => (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon">
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => handleViewDetails(row.original.id)}>
               View details
             </DropdownMenuItem>
@@ -226,11 +226,11 @@ export default function UsersPage() {
             >
               Delete user
             </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ),
-    },
-  ];
+        </DropdownMenuContent>
+      </DropdownMenu>
+    ),
+  },
+];
 
   return (
     <AdminLayout>

@@ -143,32 +143,32 @@ export default function GamesPage() {
     setSearchQuery('');
     setStartDate(undefined);
     setEndDate(undefined);
-  };
+};
 
-  const columns: ColumnDef<Game>[] = [
-    {
-      accessorKey: 'title',
-      header: 'Game',
-      cell: ({ row }) => (
-        <div className="flex items-center space-x-3">
-          <div className="h-12 w-12 rounded bg-muted overflow-hidden">
-            {row.original.thumbnailUrl && (
-              <img
-                src={row.original.thumbnailUrl}
-                alt={row.original.title}
-                className="h-full w-full object-cover"
-              />
-            )}
-          </div>
-          <div>
-            <div className="font-medium">{row.original.title}</div>
-            <div className="text-sm text-muted-foreground line-clamp-1">
-              {row.original.description}
-            </div>
+const columns: ColumnDef<Game>[] = [
+  {
+    accessorKey: 'title',
+    header: 'Game',
+    cell: ({ row }) => (
+      <div className="flex items-center space-x-3">
+        <div className="h-12 w-12 rounded bg-muted overflow-hidden">
+          {row.original.thumbnailUrl && (
+            <img
+              src={row.original.thumbnailUrl}
+              alt={row.original.title}
+              className="h-full w-full object-cover"
+            />
+          )}
+        </div>
+        <div>
+          <div className="font-medium">{row.original.title}</div>
+          <div className="text-sm text-muted-foreground line-clamp-1">
+            {row.original.description}
           </div>
         </div>
-      ),
-    },
+      </div>
+    ),
+  },
     {
       accessorKey: 'type',
       header: 'Type',
@@ -177,29 +177,29 @@ export default function GamesPage() {
         return <Badge variant="outline">{game.type || game.gameType || '-'}</Badge>;
       },
     },
-    {
-      accessorKey: 'category',
-      header: 'Category',
-      cell: ({ row }) => (
+  {
+    accessorKey: 'category',
+    header: 'Category',
+    cell: ({ row }) => (
         <Badge variant="outline">{row.original.category || '-'}</Badge>
-      ),
+    ),
+  },
+  {
+    accessorKey: 'status',
+    header: 'Status',
+    cell: ({ row }) => {
+      const status = row.original.status || 'UNKNOWN';
+      return (
+        <div className="flex items-center space-x-2">
+          <div className={`h-2 w-2 rounded-full ${statusColors[status] || 'bg-gray-400'}`} />
+          <span className="capitalize">{status.toLowerCase()}</span>
+        </div>
+      );
     },
-    {
-      accessorKey: 'status',
-      header: 'Status',
-      cell: ({ row }) => {
-        const status = row.original.status || 'UNKNOWN';
-        return (
-          <div className="flex items-center space-x-2">
-            <div className={`h-2 w-2 rounded-full ${statusColors[status] || 'bg-gray-400'}`} />
-            <span className="capitalize">{status.toLowerCase()}</span>
-          </div>
-        );
-      },
-    },
-    {
+  },
+  {
       accessorKey: 'rewardPoint',
-      header: 'Reward',
+    header: 'Reward',
       cell: ({ row }) => {
         const game = row.original as any;
         return (
@@ -208,9 +208,9 @@ export default function GamesPage() {
           </span>
         );
       },
-    },
-    {
-      id: 'actions',
+  },
+  {
+    id: 'actions',
       cell: ({ row }) => {
         const game = row.original as any;
         const gameId = game.id;
@@ -218,13 +218,13 @@ export default function GamesPage() {
         const canForceEnd = status === 'ACTIVE' || status === 'IN_PROGRESS';
 
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon">
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => handleViewDetails(gameId)}>
                 <Eye className="mr-2 h-4 w-4" />
                 View details
@@ -238,7 +238,7 @@ export default function GamesPage() {
                   <Power className="mr-2 h-4 w-4" />
                   Force end
                 </DropdownMenuItem>
-              )}
+          )}
               <DropdownMenuItem
                 className="text-red-600"
                 onClick={() => handleDelete(gameId, game.title)}
@@ -246,12 +246,12 @@ export default function GamesPage() {
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete game
               </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        </DropdownMenuContent>
+      </DropdownMenu>
         );
       },
-    },
-  ];
+  },
+];
 
   return (
     <AdminLayout>
