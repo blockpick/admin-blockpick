@@ -61,8 +61,26 @@ class ApiClient {
 
   /**
    * Build URL with query parameters
+   * If endpoint starts with /api/, treat it as a Next.js API route (relative path)
+   * Otherwise, use the baseUrl for external API calls
    */
   private buildUrl(endpoint: string, params?: Record<string, string | number | boolean | undefined>): string {
+    // If endpoint starts with /api/, treat it as a Next.js API route (relative path)
+    if (endpoint.startsWith('/api/')) {
+      const url = new URL(endpoint, typeof window !== 'undefined' ? window.location.origin : this.baseUrl);
+
+      if (params) {
+        Object.entries(params).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            url.searchParams.append(key, String(value));
+          }
+        });
+      }
+
+      return url.toString();
+    }
+
+    // For external API calls, use baseUrl
     const url = new URL(endpoint, this.baseUrl);
 
     if (params) {

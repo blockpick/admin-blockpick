@@ -3,8 +3,9 @@
  */
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { authService } from '../api';
-import type { LoginRequest, User } from '../types/auth';
+import type { LoginRequest, AdminInfo } from '../types/auth';
 import { shouldEnableQuery } from './query-utils';
 
 /**
@@ -19,15 +20,29 @@ export const authKeys = {
  * Hook to get current user
  */
 export function useCurrentUser() {
-  return useQuery({
+  const queryClient = useQueryClient();
+
+  const query = useQuery({
     queryKey: authKeys.currentUser(),
     queryFn: authService.getCurrentUser,
     enabled: shouldEnableQuery(),
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
-    refetchOnMount: false,
+    refetchOnMount: true,
   });
+
+  // Handle errors
+  useEffect(() => {
+    if (query.error && typeof window !== 'undefined') {
+      console.error('Auth error:', query.error);
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('refresh_token');
+      queryClient.resetQueries({ queryKey: authKeys.currentUser() });
+    }
+  }, [query.error, queryClient]);
+
+  return query;
 }
 
 /**
@@ -68,36 +83,39 @@ export function useLogout() {
 
       // Clear all queries
       queryClient.clear();
+
+      // Reset query client to ensure clean state
+      queryClient.resetQueries();
+    },
+    onError: () => {
+      // Even if logout fails, clear everything
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('refresh_token');
+      }
+      queryClient.clear();
+      queryClient.resetQueries();
     },
   });
 }
 
 /**
- * Hook to change password
+ * Hook to refresh token
  */
-export function useChangePassword() {
-  return useMutation({
-    mutationFn: (data: { currentPassword: string; newPassword: string }) =>
-      authService.changePassword(data),
-  });
-}
+export function useRefreshToken() {
+  const queryClient = useQueryClient();
 
-/**
- * Hook to request password reset
- */
-export function useRequestPasswordReset() {
   return useMutation({
-    mutationFn: (email: string) => authService.requestPasswordReset(email),
-  });
-}
-
-/**
- * Hook to reset password
- */
-export function useResetPassword() {
-  return useMutation({
-    mutationFn: (data: { token: string; newPassword: string }) =>
-      authService.resetPassword(data),
+    mutationFn: (refreshToken: string) =>
+      authService.refreshToken({ refreshToken }),
+    onSuccess: (data) => {
+      // Store new access token
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('auth_token', data.accessToken);
+      }
+      // Invalidate and refetch current user
+      queryClient.invalidateQueries({ queryKey: authKeys.currentUser() });
+    },
   });
 }
 

@@ -1,110 +1,137 @@
 /**
  * Game Management API Service
+ * Based on OpenAPI spec: /admin/games/*
  */
 
 import { apiClient } from './client';
 import type {
-  Game,
-  CreateGameRequest,
-  UpdateGameRequest,
+  GameDto,
+  CreateGameInput,
+  UpdateGameInput,
   GameFilterParams,
   GameStats,
+  GameType,
+  GameStatusType,
 } from '../types/game';
 import type { PageResponse, PaginationParams } from '../types/common';
 
 export const gameService = {
   /**
    * Get paginated list of games
+   * GET /admin/games
    */
   getGames: async (
-    params?: PaginationParams & GameFilterParams
-  ): Promise<PageResponse<Game>> => {
-    return apiClient.get<PageResponse<Game>>('/api/games', {
-      params: params as Record<string, string | number | boolean | undefined>
+    params?: PaginationParams & {
+      sortBy?: string;
+      sortDirection?: 'ASC' | 'DESC';
+    }
+  ): Promise<PageResponse<GameDto>> => {
+    return apiClient.get<PageResponse<GameDto>>('/admin/games', {
+      params: params as Record<string, string | number | boolean | undefined>,
     });
   },
 
   /**
    * Get game by ID
+   * GET /admin/games/{id}
    */
-  getGameById: async (id: string): Promise<Game> => {
-    return apiClient.get<Game>(`/api/games/${id}`);
-  },
-
-  /**
-   * Create new game
-   */
-  createGame: async (data: CreateGameRequest): Promise<Game> => {
-    return apiClient.post<Game>('/api/games', data);
+  getGameById: async (id: string): Promise<GameDto> => {
+    return apiClient.get<GameDto>(`/admin/games/${id}`);
   },
 
   /**
    * Update game
+   * PUT /admin/games
    */
-  updateGame: async (id: string, data: UpdateGameRequest): Promise<Game> => {
-    return apiClient.put<Game>(`/api/games/${id}`, data);
+  updateGame: async (data: UpdateGameInput): Promise<GameDto> => {
+    return apiClient.put<GameDto>('/admin/games', data);
   },
 
   /**
-   * Delete game
+   * Force end game
+   * PUT /admin/games/{id}/force-end
    */
-  deleteGame: async (id: string): Promise<void> => {
-    return apiClient.delete<void>(`/api/games/${id}`);
+  forceEndGame: async (id: string): Promise<GameDto> => {
+    return apiClient.put<GameDto>(`/admin/games/${id}/force-end`);
   },
 
   /**
-   * Publish game
+   * Get games by type
+   * GET /admin/games/type/{type}
    */
-  publishGame: async (id: string): Promise<Game> => {
-    return apiClient.post<Game>(`/api/games/${id}/publish`);
+  getGamesByType: async (
+    type: GameType,
+    params?: PaginationParams
+  ): Promise<PageResponse<GameDto>> => {
+    return apiClient.get<PageResponse<GameDto>>(`/admin/games/type/${type}`, {
+      params: params as Record<string, string | number | boolean | undefined>,
+    });
   },
 
   /**
-   * Archive game
+   * Get games by status
+   * GET /admin/games/status/{status}
    */
-  archiveGame: async (id: string): Promise<Game> => {
-    return apiClient.post<Game>(`/api/games/${id}/archive`);
+  getGamesByStatus: async (
+    status: GameStatusType,
+    params?: PaginationParams
+  ): Promise<PageResponse<GameDto>> => {
+    return apiClient.get<PageResponse<GameDto>>(`/admin/games/status/${status}`, {
+      params: params as Record<string, string | number | boolean | undefined>,
+    });
   },
 
   /**
    * Get game statistics
+   * GET /admin/games/stats
    */
-  getGameStats: async (id: string): Promise<GameStats> => {
-    return apiClient.get<GameStats>(`/api/games/${id}/stats`);
+  getGameStats: async (): Promise<GameStats> => {
+    return apiClient.get<GameStats>('/admin/games/stats');
   },
 
   /**
-   * Get leaderboard for a game
+   * Search games by title
+   * GET /admin/games/search
    */
-  getGameLeaderboard: async (
-    id: string,
+  searchGames: async (
+    title: string,
     params?: PaginationParams
-  ): Promise<
-    PageResponse<{
-      userId: string;
-      username: string;
-      score: number;
-      rank: number;
-      playedAt: string;
-    }>
-  > => {
-    return apiClient.get(`/api/games/${id}/leaderboard`, {
-      params: params as Record<string, string | number | boolean | undefined>
+  ): Promise<PageResponse<GameDto>> => {
+    return apiClient.get<PageResponse<GameDto>>('/admin/games/search', {
+      params: {
+        ...params,
+        title,
+      } as Record<string, string | number | boolean | undefined>,
     });
   },
 
   /**
-   * Upload game thumbnail
+   * Get recommended games
+   * GET /admin/games/recommended
    */
-  uploadThumbnail: async (id: string, file: File): Promise<{ url: string }> => {
-    const formData = new FormData();
-    formData.append('file', file);
-
-    const response = await fetch(`/api/games/${id}/thumbnail`, {
-      method: 'POST',
-      body: formData,
+  getRecommendedGames: async (
+    params?: PaginationParams
+  ): Promise<PageResponse<GameDto>> => {
+    return apiClient.get<PageResponse<GameDto>>('/admin/games/recommended', {
+      params: params as Record<string, string | number | boolean | undefined>,
     });
+  },
 
-    return response.json();
+  /**
+   * Get games by date range
+   * GET /admin/games/date-range
+   */
+  getGamesByDateRange: async (
+    startDate: string,
+    endDate: string,
+    params?: PaginationParams
+  ): Promise<PageResponse<GameDto>> => {
+    return apiClient.get<PageResponse<GameDto>>('/admin/games/date-range', {
+      params: {
+        ...params,
+        startDate,
+        endDate,
+      } as Record<string, string | number | boolean | undefined>,
+    });
   },
 };

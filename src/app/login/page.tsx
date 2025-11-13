@@ -1,32 +1,67 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useLogin } from '@/lib/hooks/use-auth';
+import { useLogin, useAuth } from '@/lib/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { LoadingSpinner } from '@/components/shared/loading-spinner';
 
 export default function LoginPage() {
   const router = useRouter();
   const login = useLogin();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('auth_token');
+    if (hasToken && !authLoading && isAuthenticated) {
+      router.push('/dashboard');
+    }
+  }, [isAuthenticated, authLoading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
     try {
-      await login.mutateAsync({ email, password });
+      const response = await login.mutateAsync({ email, password });
+
+      // Ensure tokens are stored
+      if (typeof window !== 'undefined' && response) {
+        if (response.accessToken) {
+          localStorage.setItem('auth_token', response.accessToken);
+        }
+        if (response.refreshToken) {
+          localStorage.setItem('refresh_token', response.refreshToken);
+        }
+      }
+
+      // Redirect to dashboard
       router.push('/dashboard');
-    } catch (err) {
-      setError('Invalid email or password');
+      router.refresh(); // Refresh to update auth state
+    } catch (err: any) {
+      // Extract error message from API error
+      const errorMessage = err?.message || err?.data?.message || err?.error || 'Invalid email or password';
+      setError(errorMessage);
+      console.error('Login error:', err);
     }
   };
+
+  // Show loading while checking auth
+  if (authLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-muted/10">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/10">

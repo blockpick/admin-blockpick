@@ -53,33 +53,41 @@ export function useGame(id: string) {
 /**
  * Hook to get game statistics
  */
-export function useGameStats(id: string) {
+export function useGameStats() {
   return useQuery({
-    queryKey: gameKeys.stats(id),
-    queryFn: () => gameService.getGameStats(id),
-    enabled: shouldEnableQueryWith(!!id),
+    queryKey: gameKeys.stats('all'),
+    queryFn: () => gameService.getGameStats(),
+    enabled: shouldEnableQuery(),
   });
 }
 
 /**
  * Hook to get game leaderboard
+ * Note: This endpoint may not be available in the current API
  */
 export function useGameLeaderboard(id: string, params?: PaginationParams) {
   return useQuery({
     queryKey: gameKeys.leaderboard(id, params),
-    queryFn: () => gameService.getGameLeaderboard(id, params),
-    enabled: shouldEnableQueryWith(!!id),
+    queryFn: async () => {
+      // Placeholder - implement when endpoint is available
+      throw new Error('Game leaderboard endpoint not available');
+    },
+    enabled: false, // Disabled until endpoint is available
   });
 }
 
 /**
  * Hook to create game
+ * Note: Use blockchainService.createGameWithBlockchain instead
  */
 export function useCreateGame() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: CreateGameRequest) => gameService.createGame(data),
+    mutationFn: async (data: CreateGameRequest) => {
+      // Placeholder - use blockchainService.createGameWithBlockchain instead
+      throw new Error('Use blockchainService.createGameWithBlockchain instead');
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: gameKeys.lists() });
     },
@@ -94,7 +102,7 @@ export function useUpdateGame() {
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateGameRequest }) =>
-      gameService.updateGame(id, data),
+      gameService.updateGame({ ...data, id }),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: gameKeys.detail(variables.id) });
       queryClient.invalidateQueries({ queryKey: gameKeys.lists() });
@@ -104,12 +112,16 @@ export function useUpdateGame() {
 
 /**
  * Hook to delete game
+ * Note: This endpoint may not be available in the current API
  */
 export function useDeleteGame() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => gameService.deleteGame(id),
+    mutationFn: async (id: string) => {
+      // Placeholder - implement when endpoint is available
+      throw new Error('Delete game endpoint not available');
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: gameKeys.lists() });
     },
@@ -117,28 +129,13 @@ export function useDeleteGame() {
 }
 
 /**
- * Hook to publish game
+ * Hook to force end game
  */
-export function usePublishGame() {
+export function useForceEndGame() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => gameService.publishGame(id),
-    onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: gameKeys.detail(id) });
-      queryClient.invalidateQueries({ queryKey: gameKeys.lists() });
-    },
-  });
-}
-
-/**
- * Hook to archive game
- */
-export function useArchiveGame() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (id: string) => gameService.archiveGame(id),
+    mutationFn: (id: string) => gameService.forceEndGame(id),
     onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: gameKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: gameKeys.lists() });
@@ -153,8 +150,10 @@ export function useUploadGameThumbnail() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, file }: { id: string; file: File }) =>
-      gameService.uploadThumbnail(id, file),
+    mutationFn: async ({ id, file }: { id: string; file: File }) => {
+      // Placeholder - use storageService.uploadImage instead
+      throw new Error('Use storageService.uploadImage instead');
+    },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: gameKeys.detail(variables.id) });
     },

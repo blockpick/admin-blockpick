@@ -6,8 +6,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { userService } from '../api';
 import { shouldEnableQuery, shouldEnableQueryWith } from './query-utils';
 import type {
+  AdminCreateUserRequest,
+  AdminUpdateUserRequest,
   CreateUserRequest,
   UpdateUserRequest,
+  UpdateUserRoleRequest,
   UserFilterParams,
 } from '../types/user';
 import type { PaginationParams } from '../types/common';
@@ -31,7 +34,7 @@ export const userKeys = {
 export function useUsers(params?: PaginationParams & UserFilterParams) {
   return useQuery({
     queryKey: userKeys.list(params),
-    queryFn: () => userService.getUsers(params),
+    queryFn: () => userService.getUsers(),
     placeholderData: (previousData) => previousData,
     enabled: shouldEnableQuery(),
   });
@@ -50,12 +53,16 @@ export function useUser(id: string) {
 
 /**
  * Hook to get user statistics
+ * Note: This endpoint may not be available in the current API
  */
 export function useUserStats(id: string) {
   return useQuery({
     queryKey: userKeys.stats(id),
-    queryFn: () => userService.getUserStats(id),
-    enabled: shouldEnableQueryWith(!!id),
+    queryFn: async () => {
+      // Placeholder - implement when endpoint is available
+      throw new Error('User stats endpoint not available');
+    },
+    enabled: false, // Disabled until endpoint is available
   });
 }
 
@@ -66,7 +73,7 @@ export function useCreateUser() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: CreateUserRequest) => userService.createUser(data),
+    mutationFn: (data: AdminCreateUserRequest) => userService.createUser(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });
     },
@@ -80,7 +87,7 @@ export function useUpdateUser() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateUserRequest }) =>
+    mutationFn: ({ id, data }: { id: string; data: AdminUpdateUserRequest }) =>
       userService.updateUser(id, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: userKeys.detail(variables.id) });
@@ -104,41 +111,16 @@ export function useDeleteUser() {
 }
 
 /**
- * Hook to suspend user
+ * Hook to update user role
  */
-export function useSuspendUser() {
+export function useUpdateUserRole() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, reason }: { id: string; reason?: string }) =>
-      userService.suspendUser(id, reason),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: userKeys.detail(variables.id) });
+    mutationFn: (data: UpdateUserRoleRequest) =>
+      userService.updateUserRole(data),
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });
     },
-  });
-}
-
-/**
- * Hook to activate user
- */
-export function useActivateUser() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (id: string) => userService.activateUser(id),
-    onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: userKeys.detail(id) });
-      queryClient.invalidateQueries({ queryKey: userKeys.lists() });
-    },
-  });
-}
-
-/**
- * Hook to export users
- */
-export function useExportUsers() {
-  return useMutation({
-    mutationFn: (params?: UserFilterParams) => userService.exportUsers(params),
   });
 }

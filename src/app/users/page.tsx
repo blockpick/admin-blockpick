@@ -34,7 +34,7 @@ const columns: ColumnDef<UserModel>[] = [
     cell: ({ row }) => (
       <div className="flex items-center space-x-3">
         <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
-          {row.original.name.charAt(0).toUpperCase()}
+          {(row.original.name || row.original.nickname || row.original.email || 'U').charAt(0).toUpperCase()}
         </div>
         <div>
           <div className="font-medium">{row.original.username}</div>
@@ -51,18 +51,21 @@ const columns: ColumnDef<UserModel>[] = [
     accessorKey: 'role',
     header: 'Role',
     cell: ({ row }) => (
-      <Badge variant="outline">{row.original.role}</Badge>
+      <Badge variant="outline">{row.original.userRole || 'USER'}</Badge>
     ),
   },
   {
     accessorKey: 'status',
     header: 'Status',
-    cell: ({ row }) => (
-      <div className="flex items-center space-x-2">
-        <div className={`h-2 w-2 rounded-full ${statusColors[row.original.status]}`} />
-        <span className="capitalize">{row.original.status.toLowerCase()}</span>
-      </div>
-    ),
+    cell: ({ row }) => {
+      const status = row.original.status || 'ACTIVE';
+      return (
+        <div className="flex items-center space-x-2">
+          <div className={`h-2 w-2 rounded-full ${statusColors[status] || 'bg-gray-400'}`} />
+          <span className="capitalize">{status.toLowerCase()}</span>
+        </div>
+      );
+    },
   },
   {
     accessorKey: 'createdAt',
@@ -118,7 +121,7 @@ export default function UsersPage() {
             title="Unable to load users"
             description="Please make sure you are logged in and have the required permissions"
           />
-        ) : data?.content.length === 0 ? (
+        ) : data?.data.length === 0 ? (
           <EmptyState
             icon={Users}
             title="No users yet"
@@ -131,8 +134,8 @@ export default function UsersPage() {
         ) : (
           <DataTable
             columns={columns}
-            data={data?.content || []}
-            searchKey="username"
+            data={data?.data || []}
+            searchKey="email"
             searchPlaceholder="Search users..."
           />
         )}

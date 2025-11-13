@@ -1,92 +1,106 @@
 /**
  * User Management API Service
+ * Based on OpenAPI spec: /admin/users/*
  */
 
 import { apiClient } from './client';
 import type {
+  User,
   UserModel,
+  AdminCreateUserRequest,
+  AdminUpdateUserRequest,
+  UpdateUserRoleRequest,
+  UserRoleInfo,
   CreateUserRequest,
   UpdateUserRequest,
   UserFilterParams,
 } from '../types/user';
-import type { PageResponse, PaginationParams } from '../types/common';
+
+export interface AdminGetUsersResponse {
+  success: boolean;
+  code: string;
+  message: string;
+  data: User[];
+  count: number;
+}
+
+export interface AdminGetUserResponse {
+  success: boolean;
+  code: string;
+  message: string;
+  data: User;
+}
+
+export interface AdminCreateUserResponse {
+  success: boolean;
+  code: string;
+  message: string;
+  data: User;
+}
+
+export interface AdminUpdateUserResponse {
+  success: boolean;
+  code: string;
+  message: string;
+  data: User;
+}
+
+export interface UpdateUserRoleResponse {
+  success: boolean;
+  code: string;
+  message: string;
+  user: UserRoleInfo;
+}
 
 export const userService = {
   /**
-   * Get paginated list of users
+   * Get all users
+   * GET /admin/users
    */
-  getUsers: async (
-    params?: PaginationParams & UserFilterParams
-  ): Promise<PageResponse<UserModel>> => {
-    return apiClient.get<PageResponse<UserModel>>('/api/users', {
-      params: params as Record<string, string | number | boolean | undefined>
-    });
+  getUsers: async (): Promise<AdminGetUsersResponse> => {
+    return apiClient.get<AdminGetUsersResponse>('/admin/users');
   },
 
   /**
    * Get user by ID
+   * GET /admin/users/{id}
    */
-  getUserById: async (id: string): Promise<UserModel> => {
-    return apiClient.get<UserModel>(`/api/users/${id}`);
+  getUserById: async (id: string): Promise<AdminGetUserResponse> => {
+    return apiClient.get<AdminGetUserResponse>(`/admin/users/${id}`);
   },
 
   /**
    * Create new user
+   * POST /admin/users
    */
-  createUser: async (data: CreateUserRequest): Promise<UserModel> => {
-    return apiClient.post<UserModel>('/api/users', data);
+  createUser: async (data: AdminCreateUserRequest): Promise<AdminCreateUserResponse> => {
+    return apiClient.post<AdminCreateUserResponse>('/admin/users', data);
   },
 
   /**
    * Update user
+   * PUT /admin/users/{id}
    */
-  updateUser: async (id: string, data: UpdateUserRequest): Promise<UserModel> => {
-    return apiClient.put<UserModel>(`/api/users/${id}`, data);
+  updateUser: async (
+    id: string,
+    data: AdminUpdateUserRequest
+  ): Promise<AdminUpdateUserResponse> => {
+    return apiClient.put<AdminUpdateUserResponse>(`/admin/users/${id}`, data);
   },
 
   /**
    * Delete user
+   * DELETE /admin/users/{id}
    */
   deleteUser: async (id: string): Promise<void> => {
-    return apiClient.delete<void>(`/api/users/${id}`);
+    return apiClient.delete<void>(`/admin/users/${id}`);
   },
 
   /**
-   * Suspend user
+   * Update user role
+   * PATCH /admin/users/role
    */
-  suspendUser: async (id: string, reason?: string): Promise<UserModel> => {
-    return apiClient.post<UserModel>(`/api/users/${id}/suspend`, { reason });
-  },
-
-  /**
-   * Activate user
-   */
-  activateUser: async (id: string): Promise<UserModel> => {
-    return apiClient.post<UserModel>(`/api/users/${id}/activate`);
-  },
-
-  /**
-   * Get user statistics
-   */
-  getUserStats: async (id: string): Promise<{
-    totalGamesPlayed: number;
-    totalPoints: number;
-    nftCount: number;
-    rank: number;
-  }> => {
-    return apiClient.get(`/api/users/${id}/stats`);
-  },
-
-  /**
-   * Export users to CSV
-   */
-  exportUsers: async (params?: UserFilterParams): Promise<Blob> => {
-    const response = await fetch(
-      apiClient['buildUrl']('/api/users/export', params as Record<string, string | number | boolean | undefined>),
-      {
-        headers: apiClient['buildHeaders'](),
-      }
-    );
-    return response.blob();
+  updateUserRole: async (data: UpdateUserRoleRequest): Promise<UpdateUserRoleResponse> => {
+    return apiClient.patch<UpdateUserRoleResponse>('/admin/users/role', data);
   },
 };

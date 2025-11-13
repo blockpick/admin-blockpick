@@ -1,112 +1,254 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { AdminLayout } from '@/components/layout/admin-layout';
 import { PageHeader } from '@/components/shared/page-header';
 import { StatsCard } from '@/components/shared/stats-card';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, Gamepad2, Image, TrendingUp } from 'lucide-react';
+import { LoadingSpinner } from '@/components/shared/loading-spinner';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Users, Gamepad2, Package, Activity, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { useDashboardStats, useRecentGames, useRecentUsers, useSystemHealth } from '@/lib/hooks/use-dashboard';
+import { formatDistanceToNow } from 'date-fns';
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const { users, totalGames, activeGames, totalProducts, isLoading: statsLoading } = useDashboardStats();
+  const { data: recentGamesData, isLoading: gamesLoading } = useRecentGames(5);
+  const { data: recentUsersData, isLoading: usersLoading } = useRecentUsers(5);
+  const { data: systemHealth, isLoading: healthLoading } = useSystemHealth();
+
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'N/A';
+    try {
+      return formatDistanceToNow(new Date(dateString), { addSuffix: true });
+    } catch {
+      return 'N/A';
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'ACTIVE':
+      case 'IN_PROGRESS':
+        return 'bg-green-500';
+      case 'DRAFT':
+      case 'READY':
+        return 'bg-yellow-500';
+      case 'ENDED':
+      case 'COMPLETED':
+        return 'bg-blue-500';
+      case 'FAILED':
+      case 'PAUSED':
+        return 'bg-red-500';
+      default:
+        return 'bg-gray-500';
+    }
+  };
+
+  if (statsLoading || gamesLoading || usersLoading) {
+    return (
+      <AdminLayout>
+        <div className="flex h-screen items-center justify-center">
+          <LoadingSpinner size="lg" />
+        </div>
+      </AdminLayout>
+    );
+  }
+
   return (
     <AdminLayout>
       <div className="space-y-6">
         <PageHeader
           title="Dashboard"
-          description="Overview of your BlockPick platform"
+          description="BlockPick 플랫폼 전체 현황"
         />
 
         {/* Stats Grid */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <StatsCard
-            title="Total Users"
-            value="12,543"
+            title="총 사용자"
+            value={users.toLocaleString()}
             icon={Users}
-            description="from last month"
-            trend={{ value: 12.5, isPositive: true }}
+            description="전체 등록 사용자"
           />
           <StatsCard
-            title="Active Games"
-            value="48"
+            title="전체 게임"
+            value={totalGames.toLocaleString()}
             icon={Gamepad2}
-            description="from last month"
-            trend={{ value: 8.2, isPositive: true }}
+            description={`활성 게임: ${activeGames.toLocaleString()}`}
           />
           <StatsCard
-            title="NFTs Minted"
-            value="3,847"
-            icon={Image}
-            description="from last month"
-            trend={{ value: 23.1, isPositive: true }}
+            title="전체 상품"
+            value={totalProducts.toLocaleString()}
+            icon={Package}
+            description="등록된 상품 수"
           />
           <StatsCard
-            title="Revenue"
-            value="$45,231"
-            icon={TrendingUp}
-            description="from last month"
-            trend={{ value: -4.3, isPositive: false }}
+            title="시스템 상태"
+            value={systemHealth?.status === 'UP' ? '정상' : '점검중'}
+            icon={systemHealth?.status === 'UP' ? CheckCircle2 : AlertCircle}
+            description={systemHealth?.status === 'UP' ? '모든 시스템 정상' : '일부 시스템 점검 중'}
           />
         </div>
 
-        {/* Charts Grid */}
-        <div className="grid gap-4 md:grid-cols-2">
-          <Card>
+        {/* System Health Alert */}
+        {systemHealth && systemHealth.alerts.length > 0 && (
+          <Card className="border-yellow-500">
             <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <AlertCircle className="h-5 w-5 text-yellow-500" />
+                시스템 알림
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {[
-                  { id: 1, activity: 'New user registered', time: '2m ago' },
-                  { id: 2, activity: 'Game completed', time: '5m ago' },
-                  { id: 3, activity: 'NFT minted', time: '10m ago' },
-                  { id: 4, activity: 'Payment received', time: '15m ago' },
-                  { id: 5, activity: 'Level unlocked', time: '20m ago' },
-                ].map((item) => (
-                  <div key={item.id} className="flex items-center space-x-4">
-                    <div className="h-10 w-10 rounded-full bg-muted" />
-                    <div className="flex-1 space-y-1">
-                      <p className="text-sm font-medium">{item.activity}</p>
-                      <p className="text-xs text-muted-foreground">
-                        Recent platform activity
-                      </p>
+              <div className="space-y-2">
+                {systemHealth.alerts.map((alert, index) => (
+                  <div key={index} className="flex items-start gap-2">
+                    <Badge variant={alert.level === 'ERROR' ? 'destructive' : 'default'}>
+                      {alert.level}
+                    </Badge>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">{alert.message}</p>
+                      <p className="text-xs text-muted-foreground">{alert.component}</p>
                     </div>
-                    <p className="text-xs text-muted-foreground">{item.time}</p>
                   </div>
                 ))}
               </div>
             </CardContent>
           </Card>
+        )}
 
+        {/* System Metrics */}
+        {systemHealth && (
           <Card>
             <CardHeader>
-              <CardTitle>Top Games</CardTitle>
+              <CardTitle>시스템 메트릭</CardTitle>
+              <CardDescription>최종 업데이트: {formatDate(systemHealth.timestamp)}</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {[
-                  { id: 1, name: 'BlockPick Adventure', plays: 8432, rating: 4.8 },
-                  { id: 2, name: 'NFT Quest', plays: 6521, rating: 4.5 },
-                  { id: 3, name: 'Crypto Challenge', plays: 5234, rating: 4.2 },
-                  { id: 4, name: 'Token Tower', plays: 4123, rating: 4.0 },
-                  { id: 5, name: 'Web3 Warriors', plays: 3456, rating: 3.9 },
-                ].map((game) => (
-                  <div key={game.id} className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <div className="h-10 w-10 rounded bg-muted" />
-                      <div>
-                        <p className="text-sm font-medium">{game.name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {game.plays.toLocaleString()} plays
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-medium">{game.rating}</p>
-                      <p className="text-xs text-muted-foreground">rating</p>
-                    </div>
-                  </div>
-                ))}
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">미발행 이벤트</p>
+                  <p className="text-2xl font-bold">{systemHealth.metrics.unpublishedEvents}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">대기 중 트랜잭션</p>
+                  <p className="text-2xl font-bold">{systemHealth.metrics.pendingTransactions}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">전송된 트랜잭션</p>
+                  <p className="text-2xl font-bold">{systemHealth.metrics.sentTransactions}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">실패한 트랜잭션</p>
+                  <p className="text-2xl font-bold text-red-500">{systemHealth.metrics.failedTransactions}</p>
+                </div>
               </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Charts Grid */}
+        <div className="grid gap-4 md:grid-cols-2">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>최근 게임</CardTitle>
+                <CardDescription>최근 생성된 게임 목록</CardDescription>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => router.push('/games')}
+              >
+                전체 보기
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {gamesLoading ? (
+                <LoadingSpinner />
+              ) : recentGamesData?.content && recentGamesData.content.length > 0 ? (
+                <div className="space-y-4">
+                  {recentGamesData.content.map((game) => (
+                    <div
+                      key={game.id}
+                      className="flex items-center justify-between cursor-pointer hover:bg-muted/50 p-2 rounded-lg transition-colors"
+                      onClick={() => router.push(`/games`)}
+                    >
+                      <div className="flex items-center space-x-4 flex-1">
+                        <div className={`h-2 w-2 rounded-full ${getStatusColor(game.status)}`} />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">{game.title}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {game.type} • {formatDate(game.createdAt)}
+                          </p>
+                        </div>
+                      </div>
+                      <Badge variant="outline" className="ml-2">
+                        {game.status}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  게임이 없습니다
+                </p>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>최근 사용자</CardTitle>
+                <CardDescription>최근 가입한 사용자 목록</CardDescription>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => router.push('/users')}
+              >
+                전체 보기
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {usersLoading ? (
+                <LoadingSpinner />
+              ) : recentUsersData && recentUsersData.length > 0 ? (
+                <div className="space-y-4">
+                  {recentUsersData.map((user) => (
+                    <div
+                      key={user.id}
+                      className="flex items-center justify-between cursor-pointer hover:bg-muted/50 p-2 rounded-lg transition-colors"
+                      onClick={() => router.push(`/users`)}
+                    >
+                      <div className="flex items-center space-x-4 flex-1">
+                        <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+                          {(user.nickname || user.email || 'U').charAt(0).toUpperCase()}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">
+                            {user.nickname || user.email}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {user.email} • {formatDate(user.createdAt)}
+                          </p>
+                        </div>
+                      </div>
+                      <Badge variant="outline" className="ml-2">
+                        {user.userRole}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  사용자가 없습니다
+                </p>
+              )}
             </CardContent>
           </Card>
         </div>

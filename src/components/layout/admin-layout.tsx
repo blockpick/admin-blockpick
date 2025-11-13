@@ -16,12 +16,11 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const { isAuthenticated, isLoading } = useAuth();
 
   useEffect(() => {
-    // In development, skip auth check to allow demo mode
-    if (process.env.NODE_ENV === 'development') {
-      return;
-    }
+    // Check if we have a token in localStorage
+    const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('auth_token');
 
-    if (!isLoading && !isAuthenticated) {
+    // If no token and not loading, redirect to login
+    if (!isLoading && !hasToken && !isAuthenticated) {
       router.push('/login');
     }
   }, [isAuthenticated, isLoading, router]);

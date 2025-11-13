@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { Bell, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,11 +13,31 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useCurrentUser } from '@/lib/hooks/use-auth';
+import { useCurrentUser, useLogout } from '@/lib/hooks/use-auth';
 import { ThemeToggle } from './theme-toggle';
+import type { AdminInfo } from '@/lib/types/auth';
 
 export function Header() {
+  const router = useRouter();
   const { data: user } = useCurrentUser();
+  const logout = useLogout();
+
+  const adminUser = user as AdminInfo | undefined;
+
+  const handleLogout = async () => {
+    try {
+      await logout.mutateAsync();
+      router.push('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Even if logout fails, clear local storage and redirect
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('refresh_token');
+      }
+      router.push('/login');
+    }
+  };
 
   return (
     <header className="flex h-16 items-center justify-between border-b bg-background px-6">
@@ -46,10 +67,13 @@ export function Header() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-10 w-10 rounded-full">
               <Avatar className="h-10 w-10">
-                <AvatarImage src={user?.profileImageUrl} alt={user?.name} />
+                <AvatarImage
+                  src={adminUser?.profileImageUrl}
+                  alt={adminUser?.nickname || adminUser?.email || 'User'}
+                />
                 <AvatarFallback>
-                  {user?.name
-                    ?.split(' ')
+                  {(adminUser?.nickname || adminUser?.email || 'A')
+                    .split(' ')
                     .map((n) => n[0])
                     .join('')
                     .toUpperCase() || 'AD'}
@@ -60,15 +84,21 @@ export function Header() {
           <DropdownMenuContent className="w-56" align="end">
             <DropdownMenuLabel>
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium">{user?.name}</p>
-                <p className="text-xs text-muted-foreground">{user?.email}</p>
+                <p className="text-sm font-medium">{adminUser?.nickname || adminUser?.email || 'User'}</p>
+                <p className="text-xs text-muted-foreground">{adminUser?.email || ''}</p>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Profile</DropdownMenuItem>
             <DropdownMenuItem>Settings</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-red-600">Logout</DropdownMenuItem>
+            <DropdownMenuItem
+              className="text-red-600 cursor-pointer"
+              onClick={handleLogout}
+              disabled={logout.isPending}
+            >
+              {logout.isPending ? 'Logging out...' : 'Logout'}
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

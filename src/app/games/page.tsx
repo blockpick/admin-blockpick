@@ -15,15 +15,24 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useGames } from '@/lib/hooks/use-games';
-import { Game, GameStatus } from '@/lib/types/game';
+import { Game, GameStatus, GameStatusType } from '@/lib/types/game';
 import { ColumnDef } from '@tanstack/react-table';
 import { MoreHorizontal, Plus, Gamepad2 } from 'lucide-react';
 
-const statusColors: Record<GameStatus, string> = {
-  [GameStatus.DRAFT]: 'bg-gray-500',
-  [GameStatus.PUBLISHED]: 'bg-green-500',
-  [GameStatus.ARCHIVED]: 'bg-orange-500',
-  [GameStatus.MAINTENANCE]: 'bg-yellow-500',
+const statusColors: Record<string, string> = {
+  DRAFT: 'bg-gray-500',
+  PUBLISHED: 'bg-green-500',
+  ARCHIVED: 'bg-orange-500',
+  MAINTENANCE: 'bg-yellow-500',
+  READY: 'bg-blue-500',
+  SCHEDULED: 'bg-purple-500',
+  ACTIVE: 'bg-green-500',
+  IN_PROGRESS: 'bg-blue-500',
+  PAUSED: 'bg-yellow-500',
+  SETTLING: 'bg-orange-500',
+  ENDED: 'bg-gray-500',
+  COMPLETED: 'bg-green-500',
+  FAILED: 'bg-red-500',
 };
 
 const columns: ColumnDef<Game>[] = [
@@ -64,12 +73,15 @@ const columns: ColumnDef<Game>[] = [
   {
     accessorKey: 'status',
     header: 'Status',
-    cell: ({ row }) => (
-      <div className="flex items-center space-x-2">
-        <div className={`h-2 w-2 rounded-full ${statusColors[row.original.status]}`} />
-        <span className="capitalize">{row.original.status.toLowerCase()}</span>
-      </div>
-    ),
+    cell: ({ row }) => {
+      const status = row.original.status || 'UNKNOWN';
+      return (
+        <div className="flex items-center space-x-2">
+          <div className={`h-2 w-2 rounded-full ${statusColors[status] || 'bg-gray-400'}`} />
+          <span className="capitalize">{status.toLowerCase()}</span>
+        </div>
+      );
+    },
   },
   {
     accessorKey: 'rewardPoints',
@@ -91,10 +103,10 @@ const columns: ColumnDef<Game>[] = [
           <DropdownMenuItem>View details</DropdownMenuItem>
           <DropdownMenuItem>Edit game</DropdownMenuItem>
           <DropdownMenuItem>View stats</DropdownMenuItem>
-          {row.original.status === GameStatus.DRAFT && (
+          {row.original.status === 'DRAFT' && (
             <DropdownMenuItem>Publish</DropdownMenuItem>
           )}
-          {row.original.status === GameStatus.PUBLISHED && (
+          {row.original.status === 'PUBLISHED' && (
             <DropdownMenuItem>Archive</DropdownMenuItem>
           )}
           <DropdownMenuItem className="text-red-600">Delete game</DropdownMenuItem>
