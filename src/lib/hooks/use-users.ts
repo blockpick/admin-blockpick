@@ -34,7 +34,7 @@ export const userKeys = {
 export function useUsers(params?: PaginationParams & UserFilterParams) {
   return useQuery({
     queryKey: userKeys.list(params),
-    queryFn: () => userService.getUsers(),
+    queryFn: () => userService.getUsers(params),
     placeholderData: (previousData) => previousData,
     enabled: shouldEnableQuery(),
   });

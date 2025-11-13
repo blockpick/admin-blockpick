@@ -4,6 +4,7 @@
  */
 
 import { apiClient } from './client';
+import type { PaginationParams } from '../types/common';
 import type {
   User,
   UserModel,
@@ -57,8 +58,12 @@ export const userService = {
    * Get all users
    * GET /admin/users
    */
-  getUsers: async (): Promise<AdminGetUsersResponse> => {
-    return apiClient.get<AdminGetUsersResponse>('/admin/users');
+  getUsers: async (
+    params?: PaginationParams & UserFilterParams
+  ): Promise<AdminGetUsersResponse> => {
+    return apiClient.get<AdminGetUsersResponse>('/admin/users', {
+      params: params as Record<string, string | number | boolean | undefined>,
+    });
   },
 
   /**
