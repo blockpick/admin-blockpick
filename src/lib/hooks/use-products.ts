@@ -2,9 +2,9 @@
  * Product management hooks using React Query
  */
 
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { productService } from '../api';
-import type { ProductFilterParams } from '../types/product';
+import type { ProductFilterParams, CreateProductInput, UpdateProductInput } from '../types/product';
 import type { PaginationParams } from '../types/common';
 import { shouldEnableQuery, shouldEnableQueryWith } from './query-utils';
 
@@ -63,6 +63,52 @@ export function useProductStats() {
     queryKey: productKeys.stats(),
     queryFn: () => productService.getProductStats(),
     enabled: shouldEnableQuery(),
+  });
+}
+
+/**
+ * Hook to create product
+ */
+export function useCreateProduct() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: CreateProductInput) => productService.createProduct(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: productKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: productKeys.stats() });
+    },
+  });
+}
+
+/**
+ * Hook to update product
+ */
+export function useUpdateProduct() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: UpdateProductInput) => productService.updateProduct(data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: productKeys.detail(variables.id) });
+      queryClient.invalidateQueries({ queryKey: productKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: productKeys.stats() });
+    },
+  });
+}
+
+/**
+ * Hook to delete product
+ */
+export function useDeleteProduct() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => productService.deleteProduct(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: productKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: productKeys.stats() });
+    },
   });
 }
 

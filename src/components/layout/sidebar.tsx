@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   Users,
   Gamepad2,
+  Package,
   Settings,
   LogOut,
 } from 'lucide-react';
@@ -28,6 +29,11 @@ const navigation = [
     name: 'Games',
     href: '/games',
     icon: Gamepad2,
+  },
+  {
+    name: 'Products',
+    href: '/products',
+    icon: Package,
   },
   {
     name: 'Settings',
