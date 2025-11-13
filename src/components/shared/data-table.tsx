@@ -167,7 +167,7 @@ export function DataTable<TData, TValue>({
       {enableServerSidePagination ? (
         <div className="flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
-            페이지 {pagination.pageIndex + 1} / {pageCount || 1}
+            총 {table.getFilteredRowModel().rows.length}개 결과
           </div>
           <div className="flex items-center space-x-2">
             <Button
@@ -183,6 +183,71 @@ export function DataTable<TData, TValue>({
               <ChevronLeft className="h-4 w-4" />
               Previous
             </Button>
+            <div className="flex items-center space-x-1">
+              {(() => {
+                const currentPage = pagination.pageIndex + 1;
+                const totalPages = pageCount || 1;
+                const pages: (number | string)[] = [];
+
+                if (totalPages <= 7) {
+                  // 7페이지 이하면 모든 페이지 번호 표시
+                  for (let i = 1; i <= totalPages; i++) {
+                    pages.push(i);
+                  }
+                } else {
+                  // 첫 페이지
+                  pages.push(1);
+
+                  if (currentPage > 3) {
+                    pages.push('...');
+                  }
+
+                  // 현재 페이지 주변
+                  const start = Math.max(2, currentPage - 1);
+                  const end = Math.min(totalPages - 1, currentPage + 1);
+
+                  for (let i = start; i <= end; i++) {
+                    pages.push(i);
+                  }
+
+                  if (currentPage < totalPages - 2) {
+                    pages.push('...');
+                  }
+
+                  // 마지막 페이지
+                  pages.push(totalPages);
+                }
+
+                return pages.map((page, index) => {
+                  if (page === '...') {
+                    return (
+                      <span key={`ellipsis-${index}`} className="px-2 text-muted-foreground">
+                        ...
+                      </span>
+                    );
+                  }
+
+                  const pageNum = page as number;
+                  const isActive = pageNum === currentPage;
+
+                  return (
+                    <Button
+                      key={pageNum}
+                      variant={isActive ? 'default' : 'outline'}
+                      size="sm"
+                      className={isActive ? '' : 'min-w-[40px]'}
+                      onClick={() => {
+                        const newPage = pageNum - 1;
+                        setPagination({ ...pagination, pageIndex: newPage });
+                        onPaginationChange?.(newPage, pagination.pageSize);
+                      }}
+                    >
+                      {pageNum}
+                    </Button>
+                  );
+                });
+              })()}
+            </div>
             <Button
               variant="outline"
               size="sm"
@@ -219,8 +284,66 @@ export function DataTable<TData, TValue>({
               <ChevronLeft className="h-4 w-4" />
               Previous
             </Button>
-            <div className="text-sm text-muted-foreground">
-              페이지 {table.getState().pagination.pageIndex + 1} / {table.getPageCount()}
+            <div className="flex items-center space-x-1">
+              {(() => {
+                const currentPage = table.getState().pagination.pageIndex + 1;
+                const totalPages = table.getPageCount();
+                const pages: (number | string)[] = [];
+
+                if (totalPages <= 7) {
+                  // 7페이지 이하면 모든 페이지 번호 표시
+                  for (let i = 1; i <= totalPages; i++) {
+                    pages.push(i);
+                  }
+                } else {
+                  // 첫 페이지
+                  pages.push(1);
+
+                  if (currentPage > 3) {
+                    pages.push('...');
+                  }
+
+                  // 현재 페이지 주변
+                  const start = Math.max(2, currentPage - 1);
+                  const end = Math.min(totalPages - 1, currentPage + 1);
+
+                  for (let i = start; i <= end; i++) {
+                    pages.push(i);
+                  }
+
+                  if (currentPage < totalPages - 2) {
+                    pages.push('...');
+                  }
+
+                  // 마지막 페이지
+                  pages.push(totalPages);
+                }
+
+                return pages.map((page, index) => {
+                  if (page === '...') {
+                    return (
+                      <span key={`ellipsis-${index}`} className="px-2 text-muted-foreground">
+                        ...
+                      </span>
+                    );
+                  }
+
+                  const pageNum = page as number;
+                  const isActive = pageNum === currentPage;
+
+                  return (
+                    <Button
+                      key={pageNum}
+                      variant={isActive ? 'default' : 'outline'}
+                      size="sm"
+                      className={isActive ? '' : 'min-w-[40px]'}
+                      onClick={() => table.setPageIndex(pageNum - 1)}
+                    >
+                      {pageNum}
+                    </Button>
+                  );
+                });
+              })()}
             </div>
             <Button
               variant="outline"

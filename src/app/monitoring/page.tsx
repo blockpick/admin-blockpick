@@ -212,15 +212,15 @@ export default function MonitoringPage() {
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
                 <Label>레벨</Label>
-                <Select value={logLevel} onValueChange={(value) => {
-                  setLogLevel(value);
+                <Select value={logLevel || 'all'} onValueChange={(value) => {
+                  setLogLevel(value === 'all' ? '' : value);
                   setLogPage(0);
                 }}>
                   <SelectTrigger className="w-[150px]">
                     <SelectValue placeholder="전체" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">전체</SelectItem>
+                    <SelectItem value="all">전체</SelectItem>
                     {logLevels.map((level) => (
                       <SelectItem key={level} value={level}>
                         {level}
@@ -231,15 +231,15 @@ export default function MonitoringPage() {
               </div>
               <div className="flex items-center space-x-2">
                 <Label>서비스</Label>
-                <Select value={logService} onValueChange={(value) => {
-                  setLogService(value);
+                <Select value={logService || 'all'} onValueChange={(value) => {
+                  setLogService(value === 'all' ? '' : value);
                   setLogPage(0);
                 }}>
                   <SelectTrigger className="w-[150px]">
                     <SelectValue placeholder="전체" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">전체</SelectItem>
+                    <SelectItem value="all">전체</SelectItem>
                     {services.map((service) => (
                       <SelectItem key={service} value={service}>
                         {service}
