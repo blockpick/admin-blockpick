@@ -94,4 +94,20 @@ export const authService = {
       localStorage.removeItem('refresh_token');
     }
   },
+
+  /**
+   * Server-side logout
+   * POST /admin/auth/logout
+   */
+  logoutServer: async (): Promise<void> => {
+    try {
+      await apiClient.post<void>('/admin/auth/logout');
+    } finally {
+      // Clear local storage regardless of server response
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('refresh_token');
+      }
+    }
+  },
 };

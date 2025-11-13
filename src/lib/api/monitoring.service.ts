@@ -42,5 +42,68 @@ export const monitoringService = {
   retryEvent: async (eventId: string): Promise<void> => {
     return apiClient.post<void>(`/admin/monitoring/events/${eventId}/retry`);
   },
+
+  /**
+   * Get system logs
+   * GET /admin/monitoring/logs
+   */
+  getLogs: async (params?: {
+    level?: string;
+    service?: string;
+    startDate?: string;
+    endDate?: string;
+    page?: number;
+    size?: number;
+  }): Promise<{
+    content: Array<{
+      id: string;
+      level: string;
+      service: string;
+      message: string;
+      timestamp: string;
+      [key: string]: unknown;
+    }>;
+    totalElements: number;
+    totalPages: number;
+  }> => {
+    return apiClient.get<{
+      content: Array<{
+        id: string;
+        level: string;
+        service: string;
+        message: string;
+        timestamp: string;
+        [key: string]: unknown;
+      }>;
+      totalElements: number;
+      totalPages: number;
+    }>('/admin/monitoring/logs', {
+      params: params as Record<string, string | number | boolean | undefined>,
+    });
+  },
+
+  /**
+   * Get performance metrics
+   * GET /admin/monitoring/metrics
+   */
+  getMetrics: async (params?: {
+    startDate?: string;
+    endDate?: string;
+    interval?: string;
+  }): Promise<{
+    cpu: Array<{ timestamp: string; value: number }>;
+    memory: Array<{ timestamp: string; value: number }>;
+    requests: Array<{ timestamp: string; count: number }>;
+    [key: string]: unknown;
+  }> => {
+    return apiClient.get<{
+      cpu: Array<{ timestamp: string; value: number }>;
+      memory: Array<{ timestamp: string; value: number }>;
+      requests: Array<{ timestamp: string; count: number }>;
+      [key: string]: unknown;
+    }>('/admin/monitoring/metrics', {
+      params: params as Record<string, string | number | boolean | undefined>,
+    });
+  },
 };
 

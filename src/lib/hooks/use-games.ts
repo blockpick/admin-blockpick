@@ -3,11 +3,12 @@
  */
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { gameService } from '../api';
+import { gameService, blockchainService } from '../api';
 import type {
   CreateGameRequest,
   UpdateGameRequest,
   GameFilterParams,
+  CreateGameInput,
 } from '../types/game';
 import type { PaginationParams } from '../types/common';
 import { shouldEnableQuery, shouldEnableQueryWith } from './query-utils';
@@ -77,16 +78,23 @@ export function useGameLeaderboard(id: string, params?: PaginationParams) {
 }
 
 /**
- * Hook to create game
- * Note: Use blockchainService.createGameWithBlockchain instead
+ * Hook to create game with blockchain
  */
 export function useCreateGame() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: CreateGameRequest) => {
-      // Placeholder - use blockchainService.createGameWithBlockchain instead
-      throw new Error('Use blockchainService.createGameWithBlockchain instead');
+    mutationFn: async ({
+      gameInput,
+      deployContract = false,
+    }: {
+      gameInput: CreateGameInput;
+      deployContract?: boolean;
+    }) => {
+      return blockchainService.createGameWithBlockchain({
+        gameInput,
+        deployContract,
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: gameKeys.lists() });

@@ -58,5 +58,49 @@ export const blockchainService = {
   getEntryStatus: async (entryId: string): Promise<EntryStatusResult> => {
     return apiClient.get<EntryStatusResult>(`/admin/blockchain/entries/${entryId}/status`);
   },
+
+  /**
+   * Get transaction by hash
+   * GET /admin/blockchain/transactions/{txHash}
+   */
+  getTransaction: async (txHash: string): Promise<{
+    txHash: string;
+    status: string;
+    blockNumber?: number;
+    gasUsed?: number;
+    createdAt: string;
+    [key: string]: unknown;
+  }> => {
+    return apiClient.get<{
+      txHash: string;
+      status: string;
+      blockNumber?: number;
+      gasUsed?: number;
+      createdAt: string;
+      [key: string]: unknown;
+    }>(`/admin/blockchain/transactions/${txHash}`);
+  },
+
+  /**
+   * Get contract information
+   * GET /admin/blockchain/games/{gameId}/contract
+   */
+  getContractInfo: async (gameId: string): Promise<{
+    contractAddress: string;
+    deploymentTxHash: string;
+    network: string;
+    status: string;
+    createdAt: string;
+    [key: string]: unknown;
+  }> => {
+    return apiClient.get<{
+      contractAddress: string;
+      deploymentTxHash: string;
+      network: string;
+      status: string;
+      createdAt: string;
+      [key: string]: unknown;
+    }>(`/admin/blockchain/games/${gameId}/contract`);
+  },
 };
 

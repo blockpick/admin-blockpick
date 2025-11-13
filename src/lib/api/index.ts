@@ -11,6 +11,7 @@ export * from './game-product.service';
 export * from './blockchain.service';
 export * from './storage.service';
 export * from './monitoring.service';
+export * from './dashboard';
 
 // Re-export for convenience
 export { authService } from './auth.service';
@@ -21,3 +22,4 @@ export { gameProductService } from './game-product.service';
 export { blockchainService } from './blockchain.service';
 export { storageService } from './storage.service';
 export { monitoringService } from './monitoring.service';
+export { dashboardService } from './dashboard';

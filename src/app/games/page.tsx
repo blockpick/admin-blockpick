@@ -6,6 +6,7 @@ import { PageHeader } from '@/components/shared/page-header';
 import { DataTable } from '@/components/shared/data-table';
 import { LoadingSpinner } from '@/components/shared/loading-spinner';
 import { EmptyState } from '@/components/shared/empty-state';
+import { CreateGameDialog } from '@/components/features/create-game-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -118,6 +119,7 @@ const columns: ColumnDef<Game>[] = [
 
 export default function GamesPage() {
   const [page, setPage] = useState(0);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const { data, isLoading, error } = useGames({ page, size: 10 });
 
   return (
@@ -129,7 +131,7 @@ export default function GamesPage() {
           action={{
             label: 'Add Game',
             icon: Plus,
-            onClick: () => console.log('Add game'),
+            onClick: () => setIsCreateDialogOpen(true),
           }}
         />
 
@@ -148,7 +150,7 @@ export default function GamesPage() {
             description="Get started by creating your first game"
             action={{
               label: 'Add Game',
-              onClick: () => console.log('Add game'),
+              onClick: () => setIsCreateDialogOpen(true),
             }}
           />
         ) : (
@@ -159,6 +161,11 @@ export default function GamesPage() {
             searchPlaceholder="Search games..."
           />
         )}
+
+        <CreateGameDialog
+          open={isCreateDialogOpen}
+          onOpenChange={setIsCreateDialogOpen}
+        />
       </div>
     </AdminLayout>
   );

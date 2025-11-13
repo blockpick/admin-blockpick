@@ -134,4 +134,41 @@ export const gameService = {
       } as Record<string, string | number | boolean | undefined>,
     });
   },
+
+  /**
+   * Delete game
+   * DELETE /admin/games/{id}
+   */
+  deleteGame: async (id: string): Promise<void> => {
+    return apiClient.delete<void>(`/admin/games/${id}`);
+  },
+
+  /**
+   * Get game leaderboard
+   * GET /admin/games/{id}/leaderboard
+   */
+  getGameLeaderboard: async (
+    id: string,
+    params?: PaginationParams
+  ): Promise<PageResponse<{
+    userId: string;
+    userEmail: string;
+    userNickname?: string;
+    rank: number;
+    score?: number;
+    entryCount: number;
+    [key: string]: unknown;
+  }>> => {
+    return apiClient.get<PageResponse<{
+      userId: string;
+      userEmail: string;
+      userNickname?: string;
+      rank: number;
+      score?: number;
+      entryCount: number;
+      [key: string]: unknown;
+    }>>(`/admin/games/${id}/leaderboard`, {
+      params: params as Record<string, string | number | boolean | undefined>,
+    });
+  },
 };

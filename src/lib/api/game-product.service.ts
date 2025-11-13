@@ -192,5 +192,53 @@ export const gameProductService = {
       regions
     );
   },
+
+  /**
+   * Update region settings for game product
+   * PUT /admin/game-product-management/game-products/{gameProductId}/regions/{regionId}
+   */
+  updateRegionSettings: async (
+    gameProductId: string,
+    regionId: string,
+    region: Partial<CreateGameProductRegionInput>
+  ): Promise<GameProductRegionDto> => {
+    return apiClient.put<GameProductRegionDto>(
+      `/admin/game-product-management/game-products/${gameProductId}/regions/${regionId}`,
+      region
+    );
+  },
+
+  /**
+   * Delete region settings for game product
+   * DELETE /admin/game-product-management/game-products/{gameProductId}/regions/{regionId}
+   */
+  deleteRegionSettings: async (
+    gameProductId: string,
+    regionId: string
+  ): Promise<void> => {
+    return apiClient.delete<void>(
+      `/admin/game-product-management/game-products/${gameProductId}/regions/${regionId}`
+    );
+  },
+
+  /**
+   * Get game product statistics
+   * GET /admin/game-product-management/games/{gameId}/products/stats
+   */
+  getGameProductStats: async (gameId: string): Promise<{
+    total: number;
+    active: number;
+    grandPrizes: number;
+    byRegion: Record<string, number>;
+    [key: string]: unknown;
+  }> => {
+    return apiClient.get<{
+      total: number;
+      active: number;
+      grandPrizes: number;
+      byRegion: Record<string, number>;
+      [key: string]: unknown;
+    }>(`/admin/game-product-management/games/${gameId}/products/stats`);
+  },
 };
 

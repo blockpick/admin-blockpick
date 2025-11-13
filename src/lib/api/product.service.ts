@@ -93,5 +93,35 @@ export const productService = {
   deleteProduct: async (id: string): Promise<void> => {
     return apiClient.delete<void>(`/admin/products/${id}`);
   },
+
+  /**
+   * Get product categories
+   * GET /admin/products/categories
+   */
+  getCategories: async (): Promise<string[]> => {
+    return apiClient.get<string[]>('/admin/products/categories');
+  },
+
+  /**
+   * Get product statistics
+   * GET /admin/products/stats
+   */
+  getProductStats: async (): Promise<{
+    total: number;
+    active: number;
+    inactive: number;
+    byBrand: Record<string, number>;
+    byCategory: Record<string, number>;
+    [key: string]: unknown;
+  }> => {
+    return apiClient.get<{
+      total: number;
+      active: number;
+      inactive: number;
+      byBrand: Record<string, number>;
+      byCategory: Record<string, number>;
+      [key: string]: unknown;
+    }>('/admin/products/stats');
+  },
 };
 

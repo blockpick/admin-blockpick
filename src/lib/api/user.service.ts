@@ -108,4 +108,24 @@ export const userService = {
   updateUserRole: async (data: UpdateUserRoleRequest): Promise<UpdateUserRoleResponse> => {
     return apiClient.patch<UpdateUserRoleResponse>('/admin/users/role', data);
   },
+
+  /**
+   * Get user statistics
+   * GET /admin/users/stats
+   */
+  getUserStats: async (): Promise<{
+    total: number;
+    active: number;
+    inactive: number;
+    banned: number;
+    [key: string]: unknown;
+  }> => {
+    return apiClient.get<{
+      total: number;
+      active: number;
+      inactive: number;
+      banned: number;
+      [key: string]: unknown;
+    }>('/admin/users/stats');
+  },
 };
