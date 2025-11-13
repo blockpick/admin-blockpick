@@ -25,11 +25,14 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { useCreateGame } from '@/lib/hooks/use-games';
 import { useProducts } from '@/lib/hooks/use-products';
+import { useContractInfo } from '@/lib/hooks/use-blockchain';
 import { gameProductService } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 import type { GameType, Currency } from '@/lib/types/game';
 import type { ProductDto } from '@/lib/types/product';
-import { Check, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, Loader2, ExternalLink, AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 
 const gameFormSchema = z.object({
   title: z.string().min(1, '게임 제목을 입력해주세요'),
@@ -74,6 +77,15 @@ export function CreateGameDialog({ open, onOpenChange }: CreateGameDialogProps) 
   const [createdGameId, setCreatedGameId] = useState<string | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
   const [productSearchQuery, setProductSearchQuery] = useState('');
+  const [deploymentTxHash, setDeploymentTxHash] = useState<string | null>(null);
+  const [contractAddress, setContractAddress] = useState<string | null>(null);
+  const [deploymentStatus, setDeploymentStatus] = useState<'PENDING' | 'DEPLOYING' | 'DEPLOYED' | 'FAILED' | null>(null);
+  const [deployContractEnabled, setDeployContractEnabled] = useState(false);
+
+  // 컨트랙트 정보 조회 (게임 생성 후 주기적으로 확인)
+  const { data: contractInfo, refetch: refetchContractInfo } = useContractInfo(
+    createdGameId || ''
+  );
 
   // 상품 목록 조회
   const { data: productsData, isLoading: isLoadingProducts } = useProducts({
@@ -118,9 +130,46 @@ export function CreateGameDialog({ open, onOpenChange }: CreateGameDialogProps) 
       setCreatedGameId(null);
       setSelectedProducts(new Set());
       setProductSearchQuery('');
+      setDeploymentTxHash(null);
+      setContractAddress(null);
+      setDeploymentStatus(null);
+      setDeployContractEnabled(false);
       form.reset();
     }
   }, [open, form]);
+
+  // 컨트랙트 배포 상태 확인 (주기적으로)
+  useEffect(() => {
+    if (createdGameId && deployContractEnabled && deploymentStatus !== 'DEPLOYED' && deploymentStatus !== 'FAILED') {
+      const interval = setInterval(() => {
+        refetchContractInfo();
+      }, 5000); // 5초마다 확인
+
+      return () => clearInterval(interval);
+    }
+  }, [createdGameId, deployContractEnabled, deploymentStatus, refetchContractInfo]);
+
+  // 컨트랙트 정보 업데이트
+  useEffect(() => {
+    if (contractInfo) {
+      if (contractInfo.deploymentTxHash) {
+        setDeploymentTxHash(contractInfo.deploymentTxHash);
+      }
+      if (contractInfo.contractAddress) {
+        setContractAddress(contractInfo.contractAddress);
+      }
+      if (contractInfo.status) {
+        const status = contractInfo.status.toUpperCase();
+        if (status === 'DEPLOYED') {
+          setDeploymentStatus('DEPLOYED');
+        } else if (status === 'DEPLOYING' || status === 'PENDING') {
+          setDeploymentStatus(status === 'DEPLOYING' ? 'DEPLOYING' : 'PENDING');
+        } else if (status === 'FAILED') {
+          setDeploymentStatus('FAILED');
+        }
+      }
+    }
+  }, [contractInfo]);
 
   // Step 1: 게임 생성
   const onStep1Submit = async (data: GameFormValues) => {
@@ -151,10 +200,32 @@ export function CreateGameDialog({ open, onOpenChange }: CreateGameDialogProps) 
 
       if (result.success && result.game?.id) {
         setCreatedGameId(result.game.id);
+
+        // 컨트랙트 배포 관련 정보 설정
+        if (deployContract) {
+          setDeployContractEnabled(true);
+          setDeploymentStatus(result.deploymentStatus || (result.contractDeploymentRequested ? 'PENDING' : null));
+          if (result.deploymentTxHash) {
+            setDeploymentTxHash(result.deploymentTxHash);
+          }
+          if (result.contractAddress) {
+            setContractAddress(result.contractAddress);
+          }
+          // GameDto에서도 확인
+          if (result.game.onchainTxHash) {
+            setDeploymentTxHash(result.game.onchainTxHash);
+          }
+          if (result.game.onchainContractAddr) {
+            setContractAddress(result.game.onchainContractAddr);
+          }
+        }
+
         setCurrentStep(2);
         toast({
           title: '게임 생성 완료',
-          description: '이제 상품을 연결해주세요.',
+          description: deployContract
+            ? '게임이 생성되었습니다. 컨트랙트 배포가 진행 중입니다. 이제 상품을 연결해주세요.'
+            : '이제 상품을 연결해주세요.',
         });
       } else {
         toast({
@@ -620,6 +691,102 @@ export function CreateGameDialog({ open, onOpenChange }: CreateGameDialogProps) 
         </form>
         ) : (
           <div className="space-y-4">
+            {/* 컨트랙트 배포 상태 표시 */}
+            {deployContractEnabled && deploymentStatus && (
+              <Alert
+                className={
+                  deploymentStatus === 'DEPLOYED'
+                    ? 'border-green-500 bg-green-50 dark:bg-green-950'
+                    : deploymentStatus === 'FAILED'
+                    ? 'border-red-500 bg-red-50 dark:bg-red-950'
+                    : 'border-yellow-500 bg-yellow-50 dark:bg-yellow-950'
+                }
+              >
+                <AlertCircle
+                  className={`h-4 w-4 ${
+                    deploymentStatus === 'DEPLOYED'
+                      ? 'text-green-600 dark:text-green-400'
+                      : deploymentStatus === 'FAILED'
+                      ? 'text-red-600 dark:text-red-400'
+                      : 'text-yellow-600 dark:text-yellow-400'
+                  }`}
+                />
+                <AlertTitle className="flex items-center gap-2">
+                  컨트랙트 배포 상태
+                  <Badge
+                    variant={
+                      deploymentStatus === 'DEPLOYED'
+                        ? 'default'
+                        : deploymentStatus === 'FAILED'
+                        ? 'destructive'
+                        : 'secondary'
+                    }
+                    className="ml-2"
+                  >
+                    {deploymentStatus === 'DEPLOYED'
+                      ? '배포 완료'
+                      : deploymentStatus === 'FAILED'
+                      ? '배포 실패'
+                      : deploymentStatus === 'DEPLOYING'
+                      ? '배포 중'
+                      : '대기 중'}
+                    {deploymentStatus === 'DEPLOYING' || deploymentStatus === 'PENDING' ? (
+                      <Loader2 className="ml-1 h-3 w-3 animate-spin" />
+                    ) : null}
+                  </Badge>
+                </AlertTitle>
+                <AlertDescription className="space-y-2 mt-2">
+                  {deploymentStatus === 'DEPLOYED' ? (
+                    <p className="text-sm text-green-700 dark:text-green-300">
+                      컨트랙트가 성공적으로 배포되었습니다. 게임 생성이 완료되었으므로 상품을 연결할 수 있습니다.
+                    </p>
+                  ) : deploymentStatus === 'FAILED' ? (
+                    <p className="text-sm text-red-700 dark:text-red-300">
+                      컨트랙트 배포에 실패했습니다. 게임은 생성되었지만 블록체인에 배포되지 않았습니다. 상품 연결은 가능합니다.
+                    </p>
+                  ) : (
+                    <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                      컨트랙트 배포가 진행 중입니다. 가스비가 소모되고 있습니다. 게임 생성은 완료되었으므로 상품을 연결할 수 있습니다.
+                    </p>
+                  )}
+                  {deploymentTxHash && (
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="font-medium">트랜잭션 해시:</span>
+                      <code className="px-2 py-1 bg-muted rounded text-xs font-mono">
+                        {deploymentTxHash.slice(0, 10)}...{deploymentTxHash.slice(-8)}
+                      </code>
+                      <a
+                        href={`https://etherscan.io/tx/${deploymentTxHash}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline flex items-center gap-1"
+                      >
+                        <ExternalLink className="h-3 w-3" />
+                        Etherscan에서 확인
+                      </a>
+                    </div>
+                  )}
+                  {contractAddress && (
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="font-medium">컨트랙트 주소:</span>
+                      <code className="px-2 py-1 bg-muted rounded text-xs font-mono">
+                        {contractAddress.slice(0, 10)}...{contractAddress.slice(-8)}
+                      </code>
+                      <a
+                        href={`https://etherscan.io/address/${contractAddress}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline flex items-center gap-1"
+                      >
+                        <ExternalLink className="h-3 w-3" />
+                        Etherscan에서 확인
+                      </a>
+                    </div>
+                  )}
+                </AlertDescription>
+              </Alert>
+            )}
+
             {/* 상품 검색 */}
             <div className="space-y-2">
               <Label htmlFor="productSearch">상품 검색</Label>

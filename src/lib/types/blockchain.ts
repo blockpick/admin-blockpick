@@ -15,6 +15,9 @@ export interface GameCreationResult {
   contractDeploymentRequested: boolean;
   message: string;
   errorCode?: string;
+  deploymentTxHash?: string;
+  contractAddress?: string;
+  deploymentStatus?: 'PENDING' | 'DEPLOYING' | 'DEPLOYED' | 'FAILED';
 }
 
 export interface ContractDeploymentFailedRequest {
