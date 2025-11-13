@@ -8,3 +8,5 @@ export * from './use-games';
 export * from './use-products';
 export * from './use-game-products';
 export * from './use-blockchain';
+export * from './use-storage';
+export * from './use-monitoring';

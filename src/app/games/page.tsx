@@ -23,7 +23,8 @@ import {
 import { useGames, useDeleteGame, useForceEndGame, useGameStats } from '@/lib/hooks/use-games';
 import { Game, GameStatusType, GameType } from '@/lib/types/game';
 import { ColumnDef } from '@tanstack/react-table';
-import { MoreHorizontal, Plus, Gamepad2, Eye, Edit, Trash2, Power, Trophy } from 'lucide-react';
+import { MoreHorizontal, Plus, Gamepad2, Eye, Edit, Trash2, Power, Trophy, ListOrdered } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 
 const statusColors: Record<string, string> = {
@@ -43,6 +44,7 @@ const statusColors: Record<string, string> = {
 };
 
 export default function GamesPage() {
+  const router = useRouter();
   const [page, setPage] = useState(0);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
@@ -232,6 +234,10 @@ const columns: ColumnDef<Game>[] = [
               <DropdownMenuItem onClick={() => handleEdit(gameId)}>
                 <Edit className="mr-2 h-4 w-4" />
                 Edit game
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push(`/games/${gameId}/leaderboard`)}>
+                <ListOrdered className="mr-2 h-4 w-4" />
+                View leaderboard
               </DropdownMenuItem>
               {canForceEnd && (
                 <DropdownMenuItem onClick={() => handleForceEnd(gameId, game.title)}>
