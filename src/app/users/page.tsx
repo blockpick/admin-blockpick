@@ -6,6 +6,7 @@ import { PageHeader } from '@/components/shared/page-header';
 import { DataTable } from '@/components/shared/data-table';
 import { LoadingSpinner } from '@/components/shared/loading-spinner';
 import { EmptyState } from '@/components/shared/empty-state';
+import { StatsCard } from '@/components/shared/stats-card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,15 +15,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { UserFilterBar } from '@/components/features/user-filter-bar';
 import { CreateUserDialog } from '@/components/features/create-user-dialog';
 import { UserDetailDialog } from '@/components/features/user-detail-dialog';
 import { EditUserDialog } from '@/components/features/edit-user-dialog';
 import { ConfirmDialog } from '@/components/features/confirm-dialog';
-import { useUsers, useDeleteUser, useUpdateUserRole } from '@/lib/hooks/use-users';
+import { useUsers, useDeleteUser, useUpdateUserRole, useUserStats } from '@/lib/hooks/use-users';
 import { UserModel, UserStatus } from '@/lib/types/user';
 import { UserRole } from '@/lib/types/auth';
 import { ColumnDef } from '@tanstack/react-table';
-import { MoreHorizontal, UserPlus, Users, Shield } from 'lucide-react';
+import { MoreHorizontal, UserPlus, Users, Shield, UserCheck, UserX, UserCog } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -51,8 +53,24 @@ export default function UsersPage() {
   const [selectedUserEmail, setSelectedUserEmail] = useState<string>('');
   const [newRole, setNewRole] = useState<UserRole>(UserRole.USER);
 
+  // 필터 상태
+  const [statusFilter, setStatusFilter] = useState<UserStatus | undefined>();
+  const [roleFilter, setRoleFilter] = useState<UserRole | undefined>();
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [startDate, setStartDate] = useState<string | undefined>();
+  const [endDate, setEndDate] = useState<string | undefined>();
+
   const { toast } = useToast();
-  const { data, isLoading, error } = useUsers({ page, size: 10 });
+  const { data, isLoading, error } = useUsers({
+    page,
+    size: 10,
+    status: statusFilter,
+    role: roleFilter,
+    search: searchQuery || undefined,
+    startDate,
+    endDate,
+  });
+  const { data: statsData, isLoading: statsLoading } = useUserStats();
   const deleteUser = useDeleteUser();
   const updateUserRole = useUpdateUserRole();
 
@@ -120,6 +138,14 @@ export default function UsersPage() {
         variant: 'destructive',
       });
     }
+  };
+
+  const handleResetFilters = () => {
+    setStatusFilter(undefined);
+    setRoleFilter(undefined);
+    setSearchQuery('');
+    setStartDate(undefined);
+    setEndDate(undefined);
   };
 
   const columns: ColumnDef<UserModel>[] = [
@@ -219,6 +245,53 @@ export default function UsersPage() {
           }}
         />
 
+        {/* 통계 카드 */}
+        {!statsLoading && statsData && (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <StatsCard
+              title="총 사용자"
+              value={statsData.total?.toLocaleString() || '0'}
+              icon={Users}
+              description="전체 등록 사용자"
+            />
+            <StatsCard
+              title="활성 사용자"
+              value={statsData.active?.toLocaleString() || '0'}
+              icon={UserCheck}
+              description={`비활성: ${statsData.inactive?.toLocaleString() || '0'}`}
+            />
+            <StatsCard
+              title="정지된 사용자"
+              value={statsData.banned?.toLocaleString() || '0'}
+              icon={UserX}
+              description="정지된 계정"
+            />
+            <StatsCard
+              title="비활성 사용자"
+              value={statsData.inactive?.toLocaleString() || '0'}
+              icon={UserCog}
+              description="비활성 계정"
+            />
+          </div>
+        )}
+
+        {/* 필터 바 */}
+        <UserFilterBar
+          status={statusFilter}
+          role={roleFilter}
+          search={searchQuery}
+          startDate={startDate}
+          endDate={endDate}
+          onStatusChange={setStatusFilter}
+          onRoleChange={setRoleFilter}
+          onSearchChange={setSearchQuery}
+          onDateRangeChange={(start, end) => {
+            setStartDate(start);
+            setEndDate(end);
+          }}
+          onReset={handleResetFilters}
+        />
+
         {isLoading ? (
           <LoadingSpinner />
         ) : error ? (
@@ -230,8 +303,8 @@ export default function UsersPage() {
         ) : data?.data.length === 0 ? (
           <EmptyState
             icon={Users}
-            title="No users yet"
-            description="Get started by creating your first user"
+            title="No users found"
+            description="Try adjusting your filters or create a new user"
             action={{
               label: 'Add User',
               onClick: () => setCreateDialogOpen(true),

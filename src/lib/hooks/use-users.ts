@@ -53,16 +53,12 @@ export function useUser(id: string) {
 
 /**
  * Hook to get user statistics
- * Note: This endpoint may not be available in the current API
  */
-export function useUserStats(id: string) {
+export function useUserStats() {
   return useQuery({
-    queryKey: userKeys.stats(id),
-    queryFn: async () => {
-      // Placeholder - implement when endpoint is available
-      throw new Error('User stats endpoint not available');
-    },
-    enabled: false, // Disabled until endpoint is available
+    queryKey: [...userKeys.all, 'stats'],
+    queryFn: () => userService.getUserStats(),
+    enabled: shouldEnableQuery(),
   });
 }
 
