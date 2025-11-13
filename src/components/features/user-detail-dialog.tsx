@@ -74,15 +74,15 @@ export function UserDetailDialog({
                     {user.nickname || user.email.split('@')[0]}
                   </h3>
                   <Badge variant="outline">{user.userRole}</Badge>
-                  {user.status && (
+                  {('status' in user && (user as any).status) && (
                     <div className="flex items-center gap-2">
                       <div
                         className={`h-2 w-2 rounded-full ${
-                          statusColors[user.status] || 'bg-gray-400'
+                          statusColors[(user as any).status as UserStatus] || 'bg-gray-400'
                         }`}
                       />
                       <span className="text-sm text-muted-foreground capitalize">
-                        {user.status.toLowerCase()}
+                        {((user as any).status as UserStatus).toLowerCase()}
                       </span>
                     </div>
                   )}
@@ -127,11 +127,11 @@ export function UserDetailDialog({
                   <div className="flex items-center gap-2">
                     <div
                       className={`h-2 w-2 rounded-full ${
-                        statusColors[user.status || UserStatus.ACTIVE] || 'bg-gray-400'
+                        statusColors[('status' in user ? ((user as any).status as UserStatus) : UserStatus.ACTIVE) || UserStatus.ACTIVE] || 'bg-gray-400'
                       }`}
                     />
                     <span className="capitalize">
-                      {(user.status || UserStatus.ACTIVE).toLowerCase()}
+                      {(('status' in user ? ((user as any).status as UserStatus) : UserStatus.ACTIVE) || UserStatus.ACTIVE).toLowerCase()}
                     </span>
                   </div>
                 </div>

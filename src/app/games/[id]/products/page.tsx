@@ -16,8 +16,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useGame } from '@/lib/hooks/use-games';
 import {
-  useGame,
   useGameProductStats,
   useCompleteGameProducts,
   useDeleteGameProduct,

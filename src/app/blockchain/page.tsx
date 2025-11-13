@@ -323,6 +323,7 @@ export default function BlockchainPage() {
             <LoadingSpinner />
           ) : contracts.length === 0 ? (
             <EmptyState
+              icon={LinkIcon}
               title="컨트랙트가 없습니다"
               description="배포된 컨트랙트가 없습니다."
             />

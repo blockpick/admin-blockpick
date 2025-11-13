@@ -148,12 +148,11 @@ export default function StoragePage() {
         <PageHeader
           title="File Storage"
           description="파일 업로드 및 관리"
-          action={
-            <Button onClick={() => setUploadDialogOpen(true)}>
-              <Upload className="mr-2 h-4 w-4" />
-              파일 업로드
-            </Button>
-          }
+          action={{
+            label: '파일 업로드',
+            icon: Upload,
+            onClick: () => setUploadDialogOpen(true),
+          }}
         />
 
         {/* Statistics Cards */}
@@ -209,6 +208,7 @@ export default function StoragePage() {
           <LoadingSpinner />
         ) : files.length === 0 ? (
           <EmptyState
+            icon={Folder}
             title="파일이 없습니다"
             description={`${selectedFolder} 폴더에 파일이 없습니다.`}
           />

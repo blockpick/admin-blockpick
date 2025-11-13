@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { fetchAdminUsers } from "@/lib/api/dashboard"
+import { userService } from "@/lib/api/user.service"
 
 export function DashboardPage() {
   const {
@@ -21,7 +21,7 @@ export function DashboardPage() {
     refetch,
   } = useQuery({
     queryKey: ["admin-users"],
-    queryFn: fetchAdminUsers,
+    queryFn: () => userService.getUsers({ page: 0, size: 10 }),
   })
 
   const handleRefresh = () => {
@@ -55,7 +55,7 @@ export function DashboardPage() {
             {isLoading ? (
               <Skeleton className="h-8 w-16" />
             ) : (
-              <p className="text-3xl font-semibold">{users?.length ?? 0}명</p>
+              <p className="text-3xl font-semibold">{users?.data?.length ?? users?.count ?? 0}명</p>
             )}
           </CardContent>
         </Card>
@@ -109,12 +109,12 @@ export function DashboardPage() {
               </p>
             ) : (
               <ul className="space-y-3">
-                {users?.map((user) => (
+                {users?.data?.map((user) => (
                   <li key={user.id} className="rounded-lg border p-3">
                     <div className="flex items-center justify-between">
-                      <p className="text-sm font-medium">{user.name}</p>
+                      <p className="text-sm font-medium">{user.nickname || user.email.split('@')[0]}</p>
                       <span className="text-xs text-muted-foreground">
-                        {user.company?.name ?? "소속 미확인"}
+                        {user.userRole ?? "역할 미확인"}
                       </span>
                     </div>
                     <p className="text-sm text-muted-foreground">{user.email}</p>

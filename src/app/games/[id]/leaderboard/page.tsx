@@ -50,10 +50,10 @@ export default function LeaderboardPage() {
       header: '순위',
       cell: ({ row }) => {
         const rank = row.getValue('rank') as number;
-        const Icon = rankIcons[rank - 1];
+        const Icon = rank <= 3 ? rankIcons[rank - 1] : null;
         return (
           <div className="flex items-center space-x-2">
-            {Icon && rank <= 3 ? (
+            {Icon ? (
               <Icon className={`h-5 w-5 ${
                 rank === 1 ? 'text-yellow-500' : rank === 2 ? 'text-gray-400' : 'text-orange-500'
               }`} />
@@ -121,6 +121,7 @@ export default function LeaderboardPage() {
 
         {entries.length === 0 ? (
           <EmptyState
+            icon={Trophy}
             title="리더보드 데이터가 없습니다"
             description="아직 참가자가 없습니다."
           />

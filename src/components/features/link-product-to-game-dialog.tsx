@@ -31,10 +31,10 @@ import { CreateProductDialog } from './create-product-dialog';
 
 const linkProductFormSchema = z.object({
   productId: z.string().min(1, '상품을 선택해주세요'),
-  isGrandPrize: z.boolean().default(false),
+  isGrandPrize: z.boolean(),
   quantity: z.number().optional(),
   sequence: z.number().optional(),
-  active: z.boolean().default(true),
+  active: z.boolean(),
 });
 
 type LinkProductFormValues = z.infer<typeof linkProductFormSchema>;

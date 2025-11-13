@@ -247,7 +247,7 @@ export default function MonitoringPage() {
             {logsLoading ? (
               <LoadingSpinner />
             ) : !logsData || logsData.content.length === 0 ? (
-              <EmptyState title="로그가 없습니다" description="선택한 조건에 맞는 로그가 없습니다." />
+              <EmptyState icon={Activity} title="로그가 없습니다" description="선택한 조건에 맞는 로그가 없습니다." />
             ) : (
               <>
                 <DataTable columns={logColumns} data={logsData.content} />
@@ -358,7 +358,7 @@ export default function MonitoringPage() {
                 )}
               </div>
             ) : (
-              <EmptyState title="이벤트 데이터가 없습니다" />
+              <EmptyState icon={Activity} title="이벤트 데이터가 없습니다" description="이벤트 데이터를 불러올 수 없습니다." />
             )}
           </TabsContent>
 
@@ -409,7 +409,7 @@ export default function MonitoringPage() {
                 )}
               </div>
             ) : (
-              <EmptyState title="트랜잭션 데이터가 없습니다" />
+              <EmptyState icon={Server} title="트랜잭션 데이터가 없습니다" description="트랜잭션 데이터를 불러올 수 없습니다." />
             )}
           </TabsContent>
         </Tabs>
