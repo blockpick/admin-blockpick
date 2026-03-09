@@ -95,6 +95,7 @@ export function GameFilterBar({
                 <SelectItem value="DAILY">DAILY</SelectItem>
                 <SelectItem value="SELECT">SELECT</SelectItem>
                 <SelectItem value="VIBE">VIBE</SelectItem>
+                <SelectItem value="PRIME">프라임</SelectItem>
               </SelectContent>
             </Select>
           </div>

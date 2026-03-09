@@ -75,7 +75,7 @@ export default function DashboardPage() {
     <AdminLayout>
       <div className="space-y-6">
         <PageHeader
-          title="Dashboard"
+          title="대시보드"
           description="BlockPick 플랫폼 전체 현황"
         />
 

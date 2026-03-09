@@ -159,7 +159,7 @@ export default function MonitoringPage() {
     <AdminLayout>
       <div className="space-y-6">
         <PageHeader
-          title="System Monitoring"
+          title="시스템 모니터링"
           description="시스템 모니터링 및 로그 관리"
         />
 
@@ -201,10 +201,10 @@ export default function MonitoringPage() {
 
         <Tabs defaultValue="logs" className="space-y-4">
           <TabsList>
-            <TabsTrigger value="logs">Logs</TabsTrigger>
-            <TabsTrigger value="metrics">Metrics</TabsTrigger>
-            <TabsTrigger value="events">Events</TabsTrigger>
-            <TabsTrigger value="transactions">Transactions</TabsTrigger>
+            <TabsTrigger value="logs">로그</TabsTrigger>
+            <TabsTrigger value="metrics">메트릭</TabsTrigger>
+            <TabsTrigger value="events">이벤트</TabsTrigger>
+            <TabsTrigger value="transactions">트랜잭션</TabsTrigger>
           </TabsList>
 
           {/* Logs Tab */}

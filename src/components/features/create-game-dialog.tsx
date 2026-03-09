@@ -38,7 +38,7 @@ const gameFormSchema = z.object({
   title: z.string().min(1, '게임 제목을 입력해주세요'),
   description: z.string().optional(),
   mainProductName: z.string().optional(),
-  type: z.enum(['DAILY', 'SELECT', 'VIBE']),
+  type: z.enum(['DAILY', 'SELECT', 'VIBE', 'PRIME']),
   category: z.string().optional(),
   entryFee: z.number().min(0, '참가비는 0 이상이어야 합니다'),
   currency: z.enum(['CASH', 'POINT']),
@@ -411,6 +411,7 @@ export function CreateGameDialog({ open, onOpenChange }: CreateGameDialogProps) 
                   <SelectItem value="DAILY">DAILY</SelectItem>
                   <SelectItem value="SELECT">SELECT</SelectItem>
                   <SelectItem value="VIBE">VIBE</SelectItem>
+                  <SelectItem value="PRIME">프라임</SelectItem>
                 </SelectContent>
               </Select>
             </div>

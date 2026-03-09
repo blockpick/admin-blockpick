@@ -1,0 +1,82 @@
+{
+  "edits": {
+    "S03": {
+      "S03-NEW-1771907321143": {
+        "componentId": "S03-NEW-1771907321143",
+        "description": "ㅁㄴㅇㅁㄴㅇ",
+        "editedAt": "2026-02-24T05:34:49.771Z",
+        "status": "added",
+        "name": "ㅁㄴㅇ",
+        "type": "chart",
+        "uiIndex": 8
+      },
+      "S03-C02": {
+        "componentId": "S03-C02",
+        "description": "",
+        "editedAt": "2026-02-24T05:34:49.771Z",
+        "status": "modified",
+        "uiIndex": 9
+      },
+      "S03-C01": {
+        "componentId": "S03-C01",
+        "description": "",
+        "editedAt": "2026-02-24T05:34:49.771Z",
+        "status": "modified",
+        "uiIndex": 1
+      },
+      "S03-C03": {
+        "componentId": "S03-C03",
+        "description": "",
+        "editedAt": "2026-02-24T05:34:49.771Z",
+        "status": "modified",
+        "uiIndex": 2
+      },
+      "S03-C04": {
+        "componentId": "S03-C04",
+        "description": "ㅁㄴㅇㅁㄴㅇㅁㄴㅇ",
+        "editedAt": "2026-02-24T05:34:49.771Z",
+        "status": "modified",
+        "uiIndex": 3
+      },
+      "S03-C05": {
+        "componentId": "S03-C05",
+        "description": "",
+        "editedAt": "2026-02-24T05:34:49.771Z",
+        "status": "modified",
+        "uiIndex": 4
+      },
+      "S03-C06": {
+        "componentId": "S03-C06",
+        "description": "",
+        "editedAt": "2026-02-24T05:34:49.771Z",
+        "status": "modified",
+        "uiIndex": 5
+      },
+      "S03-C07": {
+        "componentId": "S03-C07",
+        "description": "",
+        "editedAt": "2026-02-24T05:34:49.771Z",
+        "status": "modified",
+        "uiIndex": 7
+      },
+      "S03-C08": {
+        "componentId": "S03-C08",
+        "description": "",
+        "editedAt": "2026-02-24T05:34:49.771Z",
+        "status": "modified",
+        "uiIndex": 6
+      },
+      "S03-NEW-1771912111832": {
+        "componentId": "S03-NEW-1771912111832",
+        "description": "ㅁㄴㅇㅁㄴㅇ",
+        "editedAt": "2026-02-24T05:48:31.833Z",
+        "status": "added",
+        "name": "td: \"sjhwo9370@adrock.me\"",
+        "type": "header",
+        "uiIndex": 10,
+        "cssSelector": "[data-spec-label=\"S03-C04\"] > div > div:nth-of-type(1) > div > table > tbody > tr:nth-of-type(4) > td:nth-of-type(2)"
+      }
+    }
+  },
+  "lastUpdated": "2026-02-24T05:48:47.966Z"
+}

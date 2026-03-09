@@ -1,0 +1,70 @@
+{
+  "id": "S01",
+  "name": "로그인",
+  "route": "/login",
+  "description": "관리자 로그인 화면. 이메일/비밀번호 입력 후 JWT 토큰 발급.",
+  "accessRole": "PUBLIC",
+  "layout": "단독 (AdminLayout 없음)",
+  "screenDesign": "docs/screen-design/10-로그인.md",
+  "functionalSpec": "docs/functional-spec/01-관리자-인증.md",
+  "sourceFile": "src/app/login/page.tsx",
+  "components": [
+    {
+      "id": "S01-C01",
+      "name": "로그인 Card",
+      "type": "container",
+      "description": "전체 로그인 폼을 감싸는 Card 컨테이너 (w-full max-w-md)",
+      "uiIndex": 1
+    },
+    {
+      "id": "S01-C02",
+      "name": "브랜드 로고",
+      "type": "display",
+      "description": "BlockPick Admin 로고 영역 (h-12 w-12 rounded-lg bg-primary 정사각형)",
+      "uiIndex": 2
+    },
+    {
+      "id": "S01-C03",
+      "name": "이메일 입력 필드",
+      "type": "input",
+      "description": "관리자 이메일 입력 (type=email, placeholder=admin@blockpick.com)",
+      "uiIndex": 3
+    },
+    {
+      "id": "S01-C04",
+      "name": "비밀번호 입력 필드",
+      "type": "input",
+      "description": "비밀번호 입력 (type=password)",
+      "uiIndex": 4
+    },
+    {
+      "id": "S01-C05",
+      "name": "로그인 버튼",
+      "type": "action",
+      "description": "로그인 실행 버튼. isPending 시 '로그인 중...' 텍스트 + disabled 처리",
+      "uiIndex": 5
+    },
+    {
+      "id": "S01-C06",
+      "name": "오류 Alert",
+      "type": "feedback",
+      "description": "로그인 실패 시 표시되는 destructive Alert 컴포넌트",
+      "uiIndex": 6
+    }
+  ],
+  "apis": [
+    {
+      "method": "POST",
+      "path": "/admin/auth/login",
+      "description": "관리자 로그인. accessToken + refreshToken 반환"
+    }
+  ],
+  "hooks": ["useLogin()", "useAuth()"],
+  "states": ["default", "loading", "error", "already-authenticated"],
+  "stateFlow": {
+    "authLoading": "전체 화면 LoadingSpinner",
+    "alreadyLoggedIn": "useEffect → router.push('/dashboard')",
+    "loginSuccess": "localStorage 토큰 저장 → router.push('/dashboard')",
+    "loginFailure": "Alert(destructive) 표시"
+  }
+}

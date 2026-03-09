@@ -80,7 +80,7 @@ export default function ProfilePage() {
     <AdminLayout>
       <div className="space-y-6">
         <PageHeader
-          title="Profile"
+          title="프로필"
           description="프로필 정보를 관리합니다"
         />
 

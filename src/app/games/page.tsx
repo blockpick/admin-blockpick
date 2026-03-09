@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AdminLayout } from '@/components/layout/admin-layout';
 import { PageHeader } from '@/components/shared/page-header';
 import { DataTable } from '@/components/shared/data-table';
@@ -20,10 +20,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useGames, useDeleteGame, useForceEndGame, useGameStats } from '@/lib/hooks/use-games';
+import { useGames, useDeleteGame, useForceEndGame, useGameStats, useSettleGame } from '@/lib/hooks/use-games';
 import { Game, GameStatusType, GameType } from '@/lib/types/game';
 import { ColumnDef } from '@tanstack/react-table';
-import { MoreHorizontal, Plus, Gamepad2, Eye, Edit, Trash2, Power, Trophy, ListOrdered } from 'lucide-react';
+import { MoreHorizontal, Plus, Gamepad2, Eye, Edit, Trash2, Power, Trophy, ListOrdered, Calculator } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 
@@ -51,6 +51,7 @@ export default function GamesPage() {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [forceEndDialogOpen, setForceEndDialogOpen] = useState(false);
+  const [settleDialogOpen, setSettleDialogOpen] = useState(false);
   const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
   const [selectedGameTitle, setSelectedGameTitle] = useState<string>('');
 
@@ -75,6 +76,12 @@ export default function GamesPage() {
   const { data: statsData, isLoading: statsLoading } = useGameStats();
   const deleteGame = useDeleteGame();
   const forceEndGame = useForceEndGame();
+  const settleGame = useSettleGame();
+
+  // 검색어나 필터가 변경될 때 페이지를 0으로 리셋
+  useEffect(() => {
+    setPage(0);
+  }, [searchQuery, typeFilter, statusFilter, categoryFilter, startDate, endDate]);
 
   const handleViewDetails = (gameId: string) => {
     setSelectedGameId(gameId);
@@ -138,6 +145,32 @@ export default function GamesPage() {
     }
   };
 
+  const handleSettle = (gameId: string, title: string) => {
+    setSelectedGameId(gameId);
+    setSelectedGameTitle(title);
+    setSettleDialogOpen(true);
+  };
+
+  const handleConfirmSettle = async () => {
+    if (!selectedGameId) return;
+
+    try {
+      await settleGame.mutateAsync(selectedGameId);
+      toast({
+        title: '정산 성공',
+        description: '게임 정산이 완료되었습니다.',
+      });
+      setSettleDialogOpen(false);
+      setSelectedGameId(null);
+    } catch (error) {
+      toast({
+        title: '정산 실패',
+        description: error instanceof Error ? error.message : '게임 정산 중 오류가 발생했습니다.',
+        variant: 'destructive',
+      });
+    }
+  };
+
   const handleResetFilters = () => {
     setTypeFilter(undefined);
     setStatusFilter(undefined);
@@ -150,7 +183,7 @@ export default function GamesPage() {
 const columns: ColumnDef<Game>[] = [
   {
     accessorKey: 'title',
-    header: 'Game',
+    header: '게임',
     enableSorting: true,
     cell: ({ row }) => (
       <div className="flex items-center space-x-3">
@@ -174,7 +207,7 @@ const columns: ColumnDef<Game>[] = [
   },
     {
       accessorKey: 'type',
-      header: 'Type',
+      header: '유형',
       cell: ({ row }) => {
         const game = row.original as any;
         return <Badge variant="outline">{game.type || game.gameType || '-'}</Badge>;
@@ -182,14 +215,14 @@ const columns: ColumnDef<Game>[] = [
     },
   {
     accessorKey: 'category',
-    header: 'Category',
+    header: '카테고리',
     cell: ({ row }) => (
         <Badge variant="outline">{row.original.category || '-'}</Badge>
     ),
   },
   {
     accessorKey: 'status',
-    header: 'Status',
+    header: '상태',
     cell: ({ row }) => {
       const status = row.original.status || 'UNKNOWN';
       return (
@@ -202,7 +235,7 @@ const columns: ColumnDef<Game>[] = [
   },
   {
       accessorKey: 'rewardPoint',
-    header: 'Reward',
+    header: '보상 포인트',
       cell: ({ row }) => {
         const game = row.original as any;
         return (
@@ -220,6 +253,7 @@ const columns: ColumnDef<Game>[] = [
         const gameId = game.id;
         const status = game.status || 'UNKNOWN';
         const canForceEnd = status === 'ACTIVE' || status === 'IN_PROGRESS';
+        const canSettle = status === 'ENDED';
 
         return (
       <DropdownMenu>
@@ -231,28 +265,34 @@ const columns: ColumnDef<Game>[] = [
         <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => handleViewDetails(gameId)}>
                 <Eye className="mr-2 h-4 w-4" />
-                View details
+                상세보기
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => handleEdit(gameId)}>
                 <Edit className="mr-2 h-4 w-4" />
-                Edit game
+                수정
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => router.push(`/games/${gameId}/leaderboard`)}>
                 <ListOrdered className="mr-2 h-4 w-4" />
-                View leaderboard
+                리더보드 보기
               </DropdownMenuItem>
               {canForceEnd && (
                 <DropdownMenuItem onClick={() => handleForceEnd(gameId, game.title)}>
                   <Power className="mr-2 h-4 w-4" />
-                  Force end
+                  강제 종료
                 </DropdownMenuItem>
           )}
+              {canSettle && (
+                <DropdownMenuItem onClick={() => handleSettle(gameId, game.title)}>
+                  <Calculator className="mr-2 h-4 w-4" />
+                  정산
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem
                 className="text-red-600"
                 onClick={() => handleDelete(gameId, game.title)}
               >
                 <Trash2 className="mr-2 h-4 w-4" />
-                Delete game
+                삭제
               </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -265,10 +305,10 @@ const columns: ColumnDef<Game>[] = [
     <AdminLayout>
       <div className="space-y-6">
         <PageHeader
-          title="Games"
-          description="Manage your platform games"
+          title="게임 관리"
+          description="플랫폼 게임을 관리합니다"
           action={{
-            label: 'Add Game',
+            label: '게임 추가',
             icon: Plus,
             onClick: () => setIsCreateDialogOpen(true),
           }}
@@ -334,16 +374,16 @@ const columns: ColumnDef<Game>[] = [
         ) : error ? (
           <EmptyState
             icon={Gamepad2}
-            title="Unable to load games"
-            description="Please make sure you are logged in and have the required permissions"
+            title="게임을 불러올 수 없습니다"
+            description="로그인 상태를 확인하고 필요한 권한이 있는지 확인해주세요"
           />
         ) : data?.content.length === 0 ? (
           <EmptyState
             icon={Gamepad2}
-            title="No games found"
-            description="Try adjusting your filters or create a new game"
+            title="게임이 없습니다"
+            description="필터를 조정하거나 새 게임을 생성하세요"
             action={{
-              label: 'Add Game',
+              label: '게임 추가',
               onClick: () => setIsCreateDialogOpen(true),
             }}
           />
@@ -351,8 +391,6 @@ const columns: ColumnDef<Game>[] = [
           <DataTable
             columns={columns}
             data={data?.content || []}
-            searchKey="title"
-            searchPlaceholder="Search games..."
             enableServerSidePagination={true}
             pageCount={data?.totalPages || 0}
             onPaginationChange={(newPage) => {
@@ -397,6 +435,16 @@ const columns: ColumnDef<Game>[] = [
           cancelText="취소"
           onConfirm={handleConfirmForceEnd}
           variant="destructive"
+        />
+
+        <ConfirmDialog
+          open={settleDialogOpen}
+          onOpenChange={setSettleDialogOpen}
+          title="게임 정산"
+          description={`"${selectedGameTitle}" 게임을 정산하시겠습니까?`}
+          confirmText="정산"
+          cancelText="취소"
+          onConfirm={handleConfirmSettle}
         />
       </div>
     </AdminLayout>

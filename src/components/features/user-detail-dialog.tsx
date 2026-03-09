@@ -140,23 +140,30 @@ export function UserDetailDialog({
 
             <Separator />
 
-            {/* 포인트/캐시 정보 */}
+            {/* 재화 정보 (스펙 기준: shoppingCash, eventPoint, participationPoint) */}
             <div className="space-y-4">
               <h4 className="font-semibold">잔액 정보</h4>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 border rounded-lg">
-                  <div className="flex items-center gap-2 text-muted-foreground mb-2">
-                    <Coins className="h-4 w-4" />
-                    <span className="text-sm">포인트</span>
-                  </div>
-                  <div className="text-2xl font-bold">{user.point?.toLocaleString() || 0}</div>
-                </div>
+              <div className="grid grid-cols-3 gap-4">
                 <div className="p-4 border rounded-lg">
                   <div className="flex items-center gap-2 text-muted-foreground mb-2">
                     <DollarSign className="h-4 w-4" />
-                    <span className="text-sm">캐시</span>
+                    <span className="text-sm">쇼핑캐시</span>
                   </div>
-                  <div className="text-2xl font-bold">{user.cash?.toLocaleString() || 0}</div>
+                  <div className="text-2xl font-bold">{user.shoppingCash?.toLocaleString() || 0}</div>
+                </div>
+                <div className="p-4 border rounded-lg">
+                  <div className="flex items-center gap-2 text-muted-foreground mb-2">
+                    <Coins className="h-4 w-4" />
+                    <span className="text-sm">이벤트 포인트</span>
+                  </div>
+                  <div className="text-2xl font-bold">{user.eventPoint?.toLocaleString() || 0}</div>
+                </div>
+                <div className="p-4 border rounded-lg">
+                  <div className="flex items-center gap-2 text-muted-foreground mb-2">
+                    <Coins className="h-4 w-4" />
+                    <span className="text-sm">참여 포인트</span>
+                  </div>
+                  <div className="text-2xl font-bold">{user.participationPoint?.toLocaleString() || 0}</div>
                 </div>
               </div>
             </div>

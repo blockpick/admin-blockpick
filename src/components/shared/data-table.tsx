@@ -42,7 +42,7 @@ export function DataTable<TData, TValue>({
   columns,
   data,
   searchKey,
-  searchPlaceholder = 'Search...',
+  searchPlaceholder = '검색...',
   enableServerSidePagination = false,
   pageCount,
   onPaginationChange,
@@ -155,7 +155,7 @@ export function DataTable<TData, TValue>({
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
+                  결과가 없습니다.
                 </TableCell>
               </TableRow>
             )}
@@ -181,7 +181,7 @@ export function DataTable<TData, TValue>({
               disabled={pagination.pageIndex === 0}
             >
               <ChevronLeft className="h-4 w-4" />
-              Previous
+              이전
             </Button>
             <div className="flex items-center space-x-1">
               {(() => {
@@ -258,7 +258,7 @@ export function DataTable<TData, TValue>({
               }}
               disabled={pageCount ? pagination.pageIndex >= pageCount - 1 : false}
             >
-              Next
+              다음
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
@@ -268,10 +268,10 @@ export function DataTable<TData, TValue>({
           <div className="text-sm text-muted-foreground">
             {table.getFilteredRowModel().rows.length > 0 ? (
               <>
-                Showing {table.getRowModel().rows.length} of {table.getFilteredRowModel().rows.length} results
+                {table.getFilteredRowModel().rows.length}개 중 {table.getRowModel().rows.length}개 표시
               </>
             ) : (
-              'No results'
+              '결과가 없습니다'
             )}
           </div>
           <div className="flex items-center space-x-2">
@@ -282,7 +282,7 @@ export function DataTable<TData, TValue>({
               disabled={!table.getCanPreviousPage()}
             >
               <ChevronLeft className="h-4 w-4" />
-              Previous
+              이전
             </Button>
             <div className="flex items-center space-x-1">
               {(() => {
@@ -351,7 +351,7 @@ export function DataTable<TData, TValue>({
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
             >
-              Next
+              다음
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>

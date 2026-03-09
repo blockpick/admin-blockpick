@@ -1,0 +1,106 @@
+{
+  "id": "S07",
+  "name": "상품 관리",
+  "route": "/products",
+  "description": "상품 CRUD. 이미지 업로드(썸네일/기본 이미지) 포함",
+  "accessRole": "ADMIN",
+  "layout": "AdminLayout",
+  "screenDesign": "docs/screen-design/15-상품-관리.md",
+  "functionalSpec": "docs/functional-spec/04-상품-관리.md",
+  "sourceFile": "src/app/products/page.tsx",
+  "components": [
+    {
+      "id": "S07-C01",
+      "name": "PageHeader",
+      "type": "header",
+      "description": "타이틀: '상품 관리'. action: '상품 추가' 버튼 → CreateProductDialog 열기",
+      "uiIndex": 1
+    },
+    {
+      "id": "S07-C02",
+      "name": "통계 카드 그리드",
+      "type": "stats",
+      "description": "총 상품 수/활성 상품/브랜드 수/카테고리 수 4개 StatsCard",
+      "uiIndex": 2
+    },
+    {
+      "id": "S07-C03",
+      "name": "ProductFilterBar",
+      "type": "filter",
+      "description": "브랜드/카테고리/활성 여부 필터 (brands, categories props 주입)",
+      "uiIndex": 3
+    },
+    {
+      "id": "S07-C04",
+      "name": "상품 DataTable",
+      "type": "table",
+      "description": "서버사이드 페이지네이션. 컬럼: 썸네일+상품명/브랜드/SKU/상태/등록일/액션",
+      "uiIndex": 4
+    },
+    {
+      "id": "S07-C05",
+      "name": "CreateProductDialog",
+      "type": "dialog",
+      "description": "상품 생성 다이얼로그. 폼: 상품명/설명/브랜드/SKU/썸네일이미지/기본이미지",
+      "uiIndex": 5
+    },
+    {
+      "id": "S07-C06",
+      "name": "ProductDetailDialog",
+      "type": "dialog",
+      "description": "상품 상세 조회 다이얼로그 (이미지/기본정보/상태/날짜/메타데이터)",
+      "uiIndex": 6
+    },
+    {
+      "id": "S07-C07",
+      "name": "EditProductDialog",
+      "type": "dialog",
+      "description": "상품 수정 다이얼로그",
+      "uiIndex": 7
+    },
+    {
+      "id": "S07-C08",
+      "name": "ConfirmDialog",
+      "type": "dialog",
+      "description": "상품 삭제 확인 다이얼로그 (destructive)",
+      "uiIndex": 8
+    }
+  ],
+  "apis": [
+    {
+      "method": "GET",
+      "path": "/admin/products",
+      "description": "상품 목록 조회 (페이지네이션, 브랜드/카테고리/활성 필터)"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/products",
+      "description": "상품 생성"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/products/{id}",
+      "description": "상품 수정"
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/products/{id}",
+      "description": "상품 삭제"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/storage/upload",
+      "description": "상품 이미지 업로드 (썸네일/기본 이미지)"
+    }
+  ],
+  "hooks": [
+    "useProductStats()",
+    "useProducts(filters, pagination)",
+    "useProductBrands()",
+    "useProductCategories()",
+    "useCreateProduct()",
+    "useUpdateProduct()",
+    "useDeleteProduct()"
+  ],
+  "states": ["default", "loading", "empty", "filtered"]
+}

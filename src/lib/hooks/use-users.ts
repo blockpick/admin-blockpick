@@ -35,7 +35,8 @@ export function useUsers(params?: PaginationParams & UserFilterParams) {
   return useQuery({
     queryKey: userKeys.list(params),
     queryFn: () => userService.getUsers(params),
-    placeholderData: (previousData) => previousData,
+    // 검색어가 있을 때는 이전 데이터를 표시하지 않음 (검색 결과가 즉시 반영되도록)
+    placeholderData: params?.search ? undefined : (previousData) => previousData,
     enabled: shouldEnableQuery(),
   });
 }

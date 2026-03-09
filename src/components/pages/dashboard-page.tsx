@@ -39,9 +39,9 @@ export function DashboardPage() {
         </div>
         <div className="flex gap-3">
           <Button variant="outline" onClick={handleRefresh}>
-            데이터 새로고침
+            새로고침
           </Button>
-          <Button>새 사용자 등록</Button>
+          <Button>사용자 추가</Button>
         </div>
       </header>
 

@@ -136,6 +136,14 @@ export const gameService = {
   },
 
   /**
+   * 게임 정산
+   * POST /admin/games/{id}/settle
+   */
+  settleGame: async (id: string): Promise<GameDto> => {
+    return apiClient.post<GameDto>(`/admin/games/${id}/settle`);
+  },
+
+  /**
    * Delete game
    * DELETE /admin/games/{id}
    */

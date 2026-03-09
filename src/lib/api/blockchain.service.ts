@@ -10,6 +10,7 @@ import type {
   ContractDeploymentFailedRequest,
   ContractDeployedRequest,
   EntryStatusResult,
+  ContractVerificationResult,
 } from '../types/blockchain';
 
 export const blockchainService = {
@@ -79,6 +80,16 @@ export const blockchainService = {
       createdAt: string;
       [key: string]: unknown;
     }>(`/admin/blockchain/transactions/${txHash}`);
+  },
+
+  /**
+   * 컨트랙트 수동 검증
+   * POST /admin/blockchain/games/{gameId}/verify-contract
+   */
+  verifyContract: async (gameId: string): Promise<ContractVerificationResult> => {
+    return apiClient.post<ContractVerificationResult>(
+      `/admin/blockchain/games/${gameId}/verify-contract`
+    );
   },
 
   /**

@@ -77,6 +77,20 @@ export const authService = {
    * Legacy method for backward compatibility
    */
   getCurrentUser: async (): Promise<AdminInfo> => {
+    // 개발 환경 데브모드: mock 데이터 반환
+    if (
+      process.env.NODE_ENV === 'development' &&
+      typeof window !== 'undefined' &&
+      localStorage.getItem('dev_mode') === 'true'
+    ) {
+      return {
+        id: 'dev-admin',
+        email: 'dev@blockpick.com',
+        nickname: 'Dev Admin',
+        role: 'SUPER_ADMIN' as any,
+      };
+    }
+
     const verifyResult = await authService.verifyToken();
     if (!verifyResult.valid || !verifyResult.admin) {
       throw new Error('Invalid token or admin not found');
@@ -92,6 +106,7 @@ export const authService = {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('auth_token');
       localStorage.removeItem('refresh_token');
+      localStorage.removeItem('dev_mode');
     }
   },
 
@@ -107,6 +122,7 @@ export const authService = {
       if (typeof window !== 'undefined') {
         localStorage.removeItem('auth_token');
         localStorage.removeItem('refresh_token');
+        localStorage.removeItem('dev_mode');
       }
     }
   },

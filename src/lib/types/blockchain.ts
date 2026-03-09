@@ -34,6 +34,18 @@ export interface EntryStatusResult {
   entryId: string;
   status: string;
   txIntents: TxIntentInfo[];
+  // 스펙 추가 필드
+  txHash?: string;
+  errorCode?: string | null;
+  errorMessage?: string | null;
+}
+
+// 컨트랙트 수동 검증 결과 타입 (스펙: POST /admin/blockchain/games/{gameId}/verify-contract)
+export interface ContractVerificationResult {
+  success: boolean;
+  message: string;
+  verificationUrl: string;
+  guid: string;
 }
 
 export interface TxIntentInfo {

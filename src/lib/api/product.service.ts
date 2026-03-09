@@ -49,10 +49,11 @@ export const productService = {
     query: string,
     params?: PaginationParams
   ): Promise<PageResponse<ProductDto>> => {
+    // 스펙: GET /admin/products/search?name= (q → name으로 변경)
     return apiClient.get<PageResponse<ProductDto>>('/admin/products/search', {
       params: {
         ...params,
-        q: query,
+        name: query,
       } as Record<string, string | number | boolean | undefined>,
     });
   },

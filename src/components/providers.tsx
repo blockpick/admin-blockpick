@@ -8,6 +8,7 @@ import {
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 
 import { ThemeProvider } from "@/components/theme-provider"
+import { SpecProvider } from "@/components/spec"
 
 type ProvidersProps = {
   children: React.ReactNode
@@ -38,9 +39,11 @@ export function Providers({ children }: ProvidersProps) {
   )
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
       <QueryClientProvider client={queryClient}>
-        {children}
+        <SpecProvider>
+          {children}
+        </SpecProvider>
         {process.env.NODE_ENV === "development" ? (
           <ReactQueryDevtools initialIsOpen={false} />
         ) : null}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AdminLayout } from '@/components/layout/admin-layout';
 import { PageHeader } from '@/components/shared/page-header';
 import { DataTable } from '@/components/shared/data-table';
@@ -74,6 +74,11 @@ export default function UsersPage() {
   const { data: statsData, isLoading: statsLoading } = useUserStats();
   const deleteUser = useDeleteUser();
   const updateUserRole = useUpdateUserRole();
+
+  // 검색어나 필터가 변경될 때 페이지를 0으로 리셋
+  useEffect(() => {
+    setPage(0);
+  }, [searchQuery, statusFilter, roleFilter, startDate, endDate]);
 
   const handleViewDetails = (userId: string) => {
     setSelectedUserId(userId);
@@ -152,7 +157,7 @@ export default function UsersPage() {
 const columns: ColumnDef<UserModel>[] = [
   {
     accessorKey: 'username',
-    header: 'Username',
+    header: '사용자명',
     cell: ({ row }) => (
       <div className="flex items-center space-x-3">
         <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
@@ -169,24 +174,24 @@ const columns: ColumnDef<UserModel>[] = [
   },
   {
     accessorKey: 'email',
-    header: 'Email',
+    header: '이메일',
     cell: ({ row }) => row.original.email || '-',
   },
   {
     accessorKey: 'name',
-    header: 'Name',
+    header: '이름',
       cell: ({ row }) => row.original.name || row.original.nickname || '-',
   },
   {
     accessorKey: 'role',
-    header: 'Role',
+    header: '역할',
     cell: ({ row }) => (
       <Badge variant="outline">{row.original.userRole || 'USER'}</Badge>
     ),
   },
   {
     accessorKey: 'status',
-    header: 'Status',
+    header: '상태',
     cell: ({ row }) => {
       const status = row.original.status || 'ACTIVE';
       return (
@@ -199,7 +204,7 @@ const columns: ColumnDef<UserModel>[] = [
   },
   {
     accessorKey: 'createdAt',
-    header: 'Joined',
+    header: '가입일',
     cell: ({ row }) => (
       <span className="text-sm text-muted-foreground">
         {formatDistanceToNow(new Date(row.original.createdAt), { addSuffix: true })}
@@ -218,20 +223,20 @@ const columns: ColumnDef<UserModel>[] = [
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => handleViewDetails(row.original.id)}>
-              View details
+              상세보기
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleEdit(row.original.id)}>
-              Edit user
+              수정
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleChangeRole(row.original.id, row.original.email)}>
               <Shield className="mr-2 h-4 w-4" />
-              Change role
+              역할 변경
             </DropdownMenuItem>
             <DropdownMenuItem
               className="text-red-600"
               onClick={() => handleDelete(row.original.id, row.original.email)}
             >
-              Delete user
+              삭제
             </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -243,17 +248,17 @@ const columns: ColumnDef<UserModel>[] = [
     <AdminLayout>
       <div className="space-y-6">
         <PageHeader
-          title="Users"
-          description="Manage your platform users"
+          title="사용자 관리"
+          description="플랫폼 사용자를 관리합니다"
           action={{
-            label: 'Add User',
+            label: '사용자 추가',
             icon: UserPlus,
             onClick: () => setCreateDialogOpen(true),
           }}
         />
 
         {/* 통계 카드 */}
-        {!statsLoading && statsData && (
+        {!statsLoading && statsData ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <StatsCard
               title="총 사용자"
@@ -280,7 +285,7 @@ const columns: ColumnDef<UserModel>[] = [
               description="비활성 계정"
             />
           </div>
-        )}
+        ) : null}
 
         {/* 필터 바 */}
         <UserFilterBar
@@ -304,16 +309,16 @@ const columns: ColumnDef<UserModel>[] = [
         ) : error ? (
           <EmptyState
             icon={Users}
-            title="Unable to load users"
-            description="Please make sure you are logged in and have the required permissions"
+            title="사용자를 불러올 수 없습니다"
+            description="로그인 상태를 확인하고 필요한 권한이 있는지 확인해주세요"
           />
         ) : data?.data.length === 0 ? (
           <EmptyState
             icon={Users}
-            title="No users found"
-            description="Try adjusting your filters or create a new user"
+            title="사용자가 없습니다"
+            description="필터를 조정하거나 새 사용자를 생성하세요"
             action={{
-              label: 'Add User',
+              label: '사용자 추가',
               onClick: () => setCreateDialogOpen(true),
             }}
           />
@@ -321,8 +326,6 @@ const columns: ColumnDef<UserModel>[] = [
           <DataTable
             columns={columns}
             data={data?.data || []}
-            searchKey="email"
-            searchPlaceholder="Search users..."
             enableServerSidePagination={true}
             pageCount={data?.count ? Math.ceil(data.count / pageSize) : 0}
             onPaginationChange={(newPage) => {

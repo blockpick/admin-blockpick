@@ -1,0 +1,107 @@
+{
+  "id": "S10",
+  "name": "파일 관리",
+  "route": "/storage",
+  "description": "업로드된 파일 목록 조회 및 업로드/삭제 관리 (UI 미구현)",
+  "accessRole": "ADMIN",
+  "layout": "AdminLayout",
+  "screenDesign": "docs/screen-design/18-파일-관리.md",
+  "functionalSpec": "docs/functional-spec/08-파일-관리.md",
+  "sourceFile": "src/app/storage/page.tsx",
+  "implementationStatus": "UI 미구현 (백엔드 API 존재)",
+  "components": [
+    {
+      "id": "S10-C01",
+      "name": "PageHeader",
+      "type": "header",
+      "description": "타이틀: '파일 관리'. action: '파일 업로드' 버튼 (Upload 아이콘) → 업로드 Dialog 열기",
+      "uiIndex": 1
+    },
+    {
+      "id": "S10-C02",
+      "name": "통계 카드 그리드",
+      "type": "stats",
+      "description": "총 파일 수/이미지 파일/기타 파일/총 용량 4개 StatsCard",
+      "uiIndex": 2
+    },
+    {
+      "id": "S10-C03",
+      "name": "폴더 선택 영역",
+      "type": "filter",
+      "description": "폴더 Select (전체/products/games/profiles 등) + '파일 업로드' 버튼",
+      "uiIndex": 3
+    },
+    {
+      "id": "S10-C04",
+      "name": "파일 그리드",
+      "type": "grid",
+      "description": "파일 Card 그리드 (grid-cols-2 md:grid-cols-3 lg:grid-cols-4). 이미지는 미리보기, 기타는 아이콘",
+      "uiIndex": 4
+    },
+    {
+      "id": "S10-C05",
+      "name": "파일 Card",
+      "type": "card",
+      "description": "파일명/크기 표시 + 미리보기 버튼(Eye) + 삭제 버튼(Trash2). 클릭 시 미리보기 Dialog",
+      "uiIndex": 5
+    },
+    {
+      "id": "S10-C06",
+      "name": "파일 미리보기 Dialog",
+      "type": "dialog",
+      "description": "이미지는 next/image, 기타는 파일 정보. 다운로드/삭제 버튼 포함",
+      "uiIndex": 6
+    },
+    {
+      "id": "S10-C07",
+      "name": "업로드 Dialog",
+      "type": "dialog",
+      "description": "폴더 선택 + 드래그앤드롭 영역 + 선택 파일 목록 + 업로드 버튼",
+      "uiIndex": 7
+    },
+    {
+      "id": "S10-C08",
+      "name": "삭제 ConfirmDialog",
+      "type": "dialog",
+      "description": "파일 삭제 확인 다이얼로그 (destructive). 되돌릴 수 없음 안내",
+      "uiIndex": 8
+    },
+    {
+      "id": "S10-C09",
+      "name": "EmptyState",
+      "type": "feedback",
+      "description": "파일 없을 때 표시 (FolderOpen 아이콘)",
+      "uiIndex": 9
+    }
+  ],
+  "apis": [
+    {
+      "method": "GET",
+      "path": "/admin/storage/files",
+      "description": "파일 목록 조회 (폴더 필터)"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/storage/folders",
+      "description": "폴더 목록 조회"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/storage/upload",
+      "description": "단일/다중 파일 업로드"
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/storage/files/{fileId}",
+      "description": "파일 삭제"
+    }
+  ],
+  "hooks": [
+    "useStorageStats()",
+    "useStorageFiles(folder)",
+    "useStorageFolders()",
+    "useUploadFile()",
+    "useDeleteFile()"
+  ],
+  "states": ["default", "loading", "empty", "folder-filtered"]
+}

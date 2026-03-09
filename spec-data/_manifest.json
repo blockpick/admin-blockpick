@@ -1,0 +1,95 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-02-24",
+  "project": "admin-blockpick",
+  "screens": [
+    {
+      "id": "S01",
+      "name": "로그인",
+      "route": "/login",
+      "screenDesign": "docs/screen-design/10-로그인.md",
+      "functionalSpec": "docs/functional-spec/01-관리자-인증.md",
+      "specDataFile": "spec-data/S01-로그인.json"
+    },
+    {
+      "id": "S02",
+      "name": "대시보드",
+      "route": "/dashboard",
+      "screenDesign": "docs/screen-design/11-대시보드.md",
+      "functionalSpec": "docs/functional-spec/09-대시보드.md",
+      "specDataFile": "spec-data/S02-대시보드.json"
+    },
+    {
+      "id": "S03",
+      "name": "사용자 관리",
+      "route": "/users",
+      "screenDesign": "docs/screen-design/12-사용자-관리.md",
+      "functionalSpec": "docs/functional-spec/02-사용자-관리.md",
+      "specDataFile": "spec-data/S03-사용자-관리.json"
+    },
+    {
+      "id": "S04",
+      "name": "게임 관리",
+      "route": "/games",
+      "screenDesign": "docs/screen-design/13-게임-관리.md",
+      "functionalSpec": "docs/functional-spec/03-게임-관리.md",
+      "specDataFile": "spec-data/S04-게임-관리.json"
+    },
+    {
+      "id": "S05",
+      "name": "게임 상품 관리",
+      "route": "/games/[id]/products",
+      "screenDesign": "docs/screen-design/14-게임-상품.md",
+      "functionalSpec": "docs/functional-spec/05-게임상품-통합.md",
+      "specDataFile": "spec-data/S05-게임-상품.json"
+    },
+    {
+      "id": "S06",
+      "name": "게임 리더보드",
+      "route": "/games/[id]/leaderboard",
+      "screenDesign": "docs/screen-design/13-게임-관리.md",
+      "functionalSpec": "docs/functional-spec/03-게임-관리.md",
+      "specDataFile": "spec-data/S06-게임-리더보드.json"
+    },
+    {
+      "id": "S07",
+      "name": "상품 관리",
+      "route": "/products",
+      "screenDesign": "docs/screen-design/15-상품-관리.md",
+      "functionalSpec": "docs/functional-spec/04-상품-관리.md",
+      "specDataFile": "spec-data/S07-상품-관리.json"
+    },
+    {
+      "id": "S08",
+      "name": "블록체인",
+      "route": "/blockchain",
+      "screenDesign": "docs/screen-design/16-블록체인.md",
+      "functionalSpec": "docs/functional-spec/06-블록체인-관리.md",
+      "specDataFile": "spec-data/S08-블록체인.json"
+    },
+    {
+      "id": "S09",
+      "name": "모니터링",
+      "route": "/monitoring",
+      "screenDesign": "docs/screen-design/17-모니터링.md",
+      "functionalSpec": "docs/functional-spec/07-시스템-모니터링.md",
+      "specDataFile": "spec-data/S09-모니터링.json"
+    },
+    {
+      "id": "S10",
+      "name": "파일 관리",
+      "route": "/storage",
+      "screenDesign": "docs/screen-design/18-파일-관리.md",
+      "functionalSpec": "docs/functional-spec/08-파일-관리.md",
+      "specDataFile": "spec-data/S10-파일-관리.json"
+    },
+    {
+      "id": "S11",
+      "name": "설정/프로필",
+      "route": "/settings,/profile",
+      "screenDesign": "docs/screen-design/19-설정-프로필.md",
+      "functionalSpec": "docs/functional-spec/01-관리자-인증.md",
+      "specDataFile": "spec-data/S11-설정-프로필.json"
+    }
+  ]
+}

@@ -24,7 +24,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useAllContracts, useTransaction, useEntryStatus } from '@/lib/hooks/use-blockchain';
+import { useAllContracts, useTransaction, useEntryStatus, useVerifyContract } from '@/lib/hooks/use-blockchain';
 import { ColumnDef } from '@tanstack/react-table';
 import {
   MoreHorizontal,
@@ -35,6 +35,7 @@ import {
   XCircle,
   Clock,
   AlertCircle,
+  ShieldCheck,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
@@ -85,6 +86,23 @@ export default function BlockchainPage() {
   const { data: contractsData, isLoading: contractsLoading } = useAllContracts();
   const { data: txData, isLoading: txLoading } = useTransaction(selectedTxHash || '');
   const { data: entryData, isLoading: entryLoading } = useEntryStatus(selectedEntryId || '');
+  const verifyContract = useVerifyContract();
+
+  const handleVerifyContract = async (gameId: string) => {
+    try {
+      await verifyContract.mutateAsync(gameId);
+      toast({
+        title: '컨트랙트 검증 성공',
+        description: '컨트랙트가 성공적으로 검증되었습니다.',
+      });
+    } catch (error) {
+      toast({
+        title: '컨트랙트 검증 실패',
+        description: error instanceof Error ? error.message : '컨트랙트 검증 중 오류가 발생했습니다.',
+        variant: 'destructive',
+      });
+    }
+  };
 
   const contracts = contractsData || [];
 
@@ -231,6 +249,12 @@ export default function BlockchainPage() {
                 <LinkIcon className="mr-2 h-4 w-4" />
                 주소 복사
               </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => handleVerifyContract(contract.gameId)}
+              >
+                <ShieldCheck className="mr-2 h-4 w-4" />
+                컨트랙트 검증
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         );
@@ -242,7 +266,7 @@ export default function BlockchainPage() {
     <AdminLayout>
       <div className="space-y-6">
         <PageHeader
-          title="Blockchain Management"
+          title="블록체인 관리"
           description="블록체인 컨트랙트 및 트랜잭션 관리"
         />
 

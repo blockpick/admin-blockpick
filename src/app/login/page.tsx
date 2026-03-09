@@ -48,7 +48,7 @@ export default function LoginPage() {
       router.refresh(); // Refresh to update auth state
     } catch (err: any) {
       // Extract error message from API error
-      const errorMessage = err?.message || err?.data?.message || err?.error || 'Invalid email or password';
+      const errorMessage = err?.message || err?.data?.message || err?.error || '이메일 또는 비밀번호가 올바르지 않습니다';
       setError(errorMessage);
       console.error('Login error:', err);
     }
@@ -72,7 +72,7 @@ export default function LoginPage() {
           </div>
           <CardTitle className="text-2xl text-center">BlockPick Admin</CardTitle>
           <CardDescription className="text-center">
-            Sign in to your admin account
+            관리자 계정으로 로그인하세요
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -84,7 +84,7 @@ export default function LoginPage() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">이메일</Label>
               <Input
                 id="email"
                 type="email"
@@ -96,7 +96,7 @@ export default function LoginPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">비밀번호</Label>
               <Input
                 id="password"
                 type="password"
@@ -111,13 +111,36 @@ export default function LoginPage() {
               className="w-full"
               disabled={login.isPending}
             >
-              {login.isPending ? 'Signing in...' : 'Sign In'}
+              {login.isPending ? '로그인 중...' : '로그인'}
             </Button>
           </form>
 
-          <div className="mt-4 text-center text-sm text-muted-foreground">
-            Demo mode - Use any credentials to explore
-          </div>
+          {process.env.NODE_ENV === 'development' && (
+            <div className="mt-4 space-y-2">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-card px-2 text-muted-foreground">또는</span>
+                </div>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={() => {
+                  localStorage.setItem('dev_mode', 'true');
+                  localStorage.setItem('auth_token', 'dev_mock_token_' + Date.now());
+                  localStorage.setItem('refresh_token', 'dev_mock_refresh_' + Date.now());
+                  router.push('/dashboard');
+                  router.refresh();
+                }}
+              >
+                데브모드로 진입
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

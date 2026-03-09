@@ -14,26 +14,26 @@ export default function SettingsPage() {
     <AdminLayout>
       <div className="space-y-6">
         <PageHeader
-          title="Settings"
-          description="Manage your admin account settings and preferences"
+          title="설정"
+          description="관리자 계정 설정 및 기본 설정을 관리합니다"
         />
 
         <div className="grid gap-6">
           {/* Profile Settings */}
           <Card>
             <CardHeader>
-              <CardTitle>Profile</CardTitle>
+              <CardTitle>프로필</CardTitle>
               <CardDescription>
-                Update your personal information
+                개인 정보를 업데이트합니다
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-2">
-                <Label htmlFor="name">Name</Label>
-                <Input id="name" placeholder="Your name" defaultValue="Admin" />
+                <Label htmlFor="name">이름</Label>
+                <Input id="name" placeholder="이름을 입력하세요" defaultValue="Admin" />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">이메일</Label>
                 <Input
                   id="email"
                   type="email"
@@ -41,49 +41,49 @@ export default function SettingsPage() {
                   defaultValue="admin@blockpick.net"
                 />
               </div>
-              <Button>Save Changes</Button>
+              <Button>변경사항 저장</Button>
             </CardContent>
           </Card>
 
           {/* Security Settings */}
           <Card>
             <CardHeader>
-              <CardTitle>Security</CardTitle>
+              <CardTitle>보안</CardTitle>
               <CardDescription>
-                Manage your account security settings
+                계정 보안 설정을 관리합니다
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-2">
-                <Label htmlFor="current-password">Current Password</Label>
+                <Label htmlFor="current-password">현재 비밀번호</Label>
                 <Input id="current-password" type="password" />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="new-password">New Password</Label>
+                <Label htmlFor="new-password">새 비밀번호</Label>
                 <Input id="new-password" type="password" />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="confirm-password">Confirm New Password</Label>
+                <Label htmlFor="confirm-password">새 비밀번호 확인</Label>
                 <Input id="confirm-password" type="password" />
               </div>
-              <Button>Update Password</Button>
+              <Button>비밀번호 변경</Button>
             </CardContent>
           </Card>
 
           {/* Notification Settings */}
           <Card>
             <CardHeader>
-              <CardTitle>Notifications</CardTitle>
+              <CardTitle>알림</CardTitle>
               <CardDescription>
-                Configure how you receive notifications
+                알림 수신 방법을 설정합니다
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Email Notifications</Label>
+                  <Label>이메일 알림</Label>
                   <p className="text-sm text-muted-foreground">
-                    Receive email about platform activities
+                    플랫폼 활동에 대한 이메일을 수신합니다
                   </p>
                 </div>
                 <Switch defaultChecked />
@@ -91,9 +91,9 @@ export default function SettingsPage() {
               <Separator />
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>New User Alerts</Label>
+                  <Label>신규 사용자 알림</Label>
                   <p className="text-sm text-muted-foreground">
-                    Get notified when new users register
+                    새 사용자가 가입할 때 알림을 받습니다
                   </p>
                 </div>
                 <Switch defaultChecked />
@@ -101,9 +101,9 @@ export default function SettingsPage() {
               <Separator />
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Game Activity</Label>
+                  <Label>게임 활동</Label>
                   <p className="text-sm text-muted-foreground">
-                    Notifications about game completions
+                    게임 완료에 대한 알림을 받습니다
                   </p>
                 </div>
                 <Switch />
@@ -111,9 +111,9 @@ export default function SettingsPage() {
               <Separator />
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Security Alerts</Label>
+                  <Label>보안 알림</Label>
                   <p className="text-sm text-muted-foreground">
-                    Important security notifications
+                    중요 보안 알림을 받습니다
                   </p>
                 </div>
                 <Switch defaultChecked />
@@ -124,17 +124,17 @@ export default function SettingsPage() {
           {/* System Settings */}
           <Card>
             <CardHeader>
-              <CardTitle>System</CardTitle>
+              <CardTitle>시스템</CardTitle>
               <CardDescription>
-                General system preferences
+                일반 시스템 설정을 관리합니다
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Dark Mode</Label>
+                  <Label>다크 모드</Label>
                   <p className="text-sm text-muted-foreground">
-                    Enable dark theme
+                    다크 테마를 활성화합니다
                   </p>
                 </div>
                 <Switch />
@@ -142,9 +142,9 @@ export default function SettingsPage() {
               <Separator />
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Auto-refresh Dashboard</Label>
+                  <Label>대시보드 자동 새로고침</Label>
                   <p className="text-sm text-muted-foreground">
-                    Automatically update dashboard data
+                    대시보드 데이터를 자동으로 업데이트합니다
                   </p>
                 </div>
                 <Switch defaultChecked />

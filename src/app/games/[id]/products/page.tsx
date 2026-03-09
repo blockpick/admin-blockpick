@@ -131,7 +131,7 @@ export default function GameProductsPage() {
             title={`${game.title} - 상품 관리`}
             description="게임에 연결된 상품을 관리합니다"
             action={{
-              label: 'Add Product',
+              label: '상품 추가',
               icon: PackagePlus,
               onClick: () => setLinkDialogOpen(true),
             }}
@@ -295,7 +295,7 @@ export default function GameProductsPage() {
             title="연결된 상품이 없습니다"
             description="게임에 상품을 추가하여 시작하세요"
             action={{
-              label: 'Add Product',
+              label: '상품 추가',
               onClick: () => setLinkDialogOpen(true),
             }}
           />

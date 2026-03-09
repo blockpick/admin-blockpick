@@ -1,0 +1,47 @@
+{
+  "id": "S06",
+  "name": "게임 리더보드",
+  "route": "/games/[id]/leaderboard",
+  "description": "특정 게임의 참가자 순위 및 결과 조회 (UI 미구현 상태)",
+  "accessRole": "ADMIN",
+  "layout": "AdminLayout",
+  "screenDesign": "docs/screen-design/13-게임-관리.md",
+  "functionalSpec": "docs/functional-spec/03-게임-관리.md",
+  "sourceFile": "src/app/games/[id]/leaderboard/page.tsx",
+  "implementationStatus": "UI 미구현 (백엔드 API 존재)",
+  "routeParams": {
+    "id": "게임 ID"
+  },
+  "components": [
+    {
+      "id": "S06-C01",
+      "name": "뒤로가기 버튼",
+      "type": "navigation",
+      "description": "ArrowLeft 아이콘 버튼 → router.push('/games')",
+      "uiIndex": 1
+    },
+    {
+      "id": "S06-C02",
+      "name": "PageHeader",
+      "type": "header",
+      "description": "타이틀: '{game.title} - 리더보드'",
+      "uiIndex": 2
+    },
+    {
+      "id": "S06-C03",
+      "name": "리더보드 DataTable",
+      "type": "table",
+      "description": "순위/사용자/점수/참가 시간 컬럼 (미구현)",
+      "uiIndex": 3
+    }
+  ],
+  "apis": [
+    {
+      "method": "GET",
+      "path": "/admin/games/{id}/leaderboard",
+      "description": "게임 리더보드 조회"
+    }
+  ],
+  "hooks": [],
+  "states": ["default", "loading", "empty"]
+}

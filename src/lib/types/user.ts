@@ -12,8 +12,13 @@ export interface User {
   password?: string;
   nickname?: string;
   profileImageUrl?: string;
-  point: number;
-  cash: number;
+  // 스펙 기준 재화 필드
+  shoppingCash: number;
+  eventPoint: number;
+  participationPoint: number;
+  // 하위 호환성을 위해 optional로 유지
+  point?: number;
+  cash?: number;
   isPushNotification: boolean;
   isMarketingNotification: boolean;
   isBan: boolean;

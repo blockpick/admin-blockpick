@@ -5,14 +5,19 @@
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api-dev.blockpick.net';
 
+// 단일 이미지 업로드 응답 (스펙 기준)
 export interface UploadImageResponse {
-  url?: string;
-  [key: string]: unknown;
+  url: string;
+  thumbnailUrl: string;
+  message: string;
 }
 
+// 다중 이미지 업로드 응답 (스펙 기준)
 export interface UploadImagesResponse {
-  urls?: string[];
-  [key: string]: unknown;
+  results: Array<{ fileName: string; url: string; thumbnailUrl: string }>;
+  errors: Array<unknown>;
+  successCount: number;
+  errorCount: number;
 }
 
 export const storageService = {

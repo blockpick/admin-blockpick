@@ -146,7 +146,7 @@ export default function StoragePage() {
     <AdminLayout>
       <div className="space-y-6">
         <PageHeader
-          title="File Storage"
+          title="파일 관리"
           description="파일 업로드 및 관리"
           action={{
             label: '파일 업로드',

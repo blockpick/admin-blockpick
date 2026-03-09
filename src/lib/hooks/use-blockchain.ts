@@ -6,7 +6,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { blockchainService } from '../api';
 import { gameService } from '../api';
 import { shouldEnableQuery, shouldEnableQueryWith } from './query-utils';
-import type { EntryStatusResult } from '../types/blockchain';
+import type { EntryStatusResult, ContractVerificationResult } from '../types/blockchain';
 
 /**
  * Query keys for blockchain-related queries
@@ -77,6 +77,21 @@ export function useHandleContractDeploymentFailed() {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: blockchainKeys.contract(variables.gameId) });
+    },
+  });
+}
+
+/**
+ * 컨트랙트 수동 검증 훅
+ */
+export function useVerifyContract() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (gameId: string) => blockchainService.verifyContract(gameId),
+    onSuccess: (_, gameId) => {
+      // 검증 완료 후 해당 게임의 컨트랙트 정보 캐시 무효화
+      queryClient.invalidateQueries({ queryKey: blockchainKeys.contract(gameId) });
     },
   });
 }

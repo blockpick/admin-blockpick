@@ -60,6 +60,11 @@ export default function ProductsPage() {
   const { data: statsData, isLoading: statsLoading, error: statsError } = useProductStats();
   const deleteProduct = useDeleteProduct();
 
+  // 검색어나 필터가 변경될 때 페이지를 0으로 리셋
+  useEffect(() => {
+    setPage(0);
+  }, [searchQuery, brandFilter, categoryFilter, activeFilter]);
+
   // 브랜드 및 카테고리 목록 로드
   useEffect(() => {
     const loadFilters = async () => {
@@ -264,10 +269,10 @@ export default function ProductsPage() {
     <AdminLayout>
       <div className="space-y-6">
         <PageHeader
-          title="Products"
+          title="상품 관리"
           description="상품을 관리합니다"
           action={{
-            label: 'Add Product',
+            label: '상품 추가',
             icon: PackagePlus,
             onClick: () => setCreateDialogOpen(true),
           }}
@@ -332,7 +337,7 @@ export default function ProductsPage() {
             title="상품이 없습니다"
             description="필터를 조정하거나 새 상품을 생성하세요"
             action={{
-              label: 'Add Product',
+              label: '상품 추가',
               onClick: () => setCreateDialogOpen(true),
             }}
           />
@@ -340,8 +345,6 @@ export default function ProductsPage() {
           <DataTable
             columns={columns}
             data={data?.content || []}
-            searchKey="name"
-            searchPlaceholder="상품 검색..."
             enableServerSidePagination={true}
             pageCount={data?.totalPages || 0}
             onPaginationChange={(newPage) => {

@@ -35,7 +35,8 @@ export function useGames(params?: PaginationParams & GameFilterParams) {
   return useQuery({
     queryKey: gameKeys.list(params),
     queryFn: () => gameService.getGames(params),
-    placeholderData: (previousData) => previousData,
+    // 검색어가 있을 때는 이전 데이터를 표시하지 않음 (검색 결과가 즉시 반영되도록)
+    placeholderData: params?.search || params?.title ? undefined : (previousData) => previousData,
     enabled: shouldEnableQuery(),
   });
 }
@@ -127,6 +128,22 @@ export function useDeleteGame() {
   return useMutation({
     mutationFn: async (id: string) => gameService.deleteGame(id),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: gameKeys.lists() });
+    },
+  });
+}
+
+/**
+ * 게임 정산 훅
+ */
+export function useSettleGame() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => gameService.settleGame(id),
+    onSuccess: (_, id) => {
+      // 정산 완료 후 해당 게임 상세 및 목록 캐시 무효화
+      queryClient.invalidateQueries({ queryKey: gameKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: gameKeys.lists() });
     },
   });

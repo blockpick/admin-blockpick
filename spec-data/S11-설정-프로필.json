@@ -1,0 +1,96 @@
+{
+  "id": "S11",
+  "name": "설정/프로필",
+  "route": "/settings,/profile",
+  "description": "관리자 프로필 수정, 보안(비밀번호 변경), 알림 설정, 시스템 설정. 프로필 페이지 별도 존재",
+  "accessRole": "ADMIN",
+  "layout": "AdminLayout",
+  "screenDesign": "docs/screen-design/19-설정-프로필.md",
+  "functionalSpec": "docs/functional-spec/01-관리자-인증.md",
+  "sourceFiles": [
+    "src/app/settings/page.tsx",
+    "src/app/profile/page.tsx"
+  ],
+  "components": [
+    {
+      "id": "S11-C01",
+      "name": "설정 PageHeader",
+      "type": "header",
+      "description": "타이틀: '설정', 설명: '시스템 설정을 관리합니다'",
+      "uiIndex": 1
+    },
+    {
+      "id": "S11-C02",
+      "name": "프로필 설정 Card",
+      "type": "form",
+      "description": "닉네임/이메일 Input + 저장 버튼 (/settings)",
+      "uiIndex": 2
+    },
+    {
+      "id": "S11-C03",
+      "name": "보안 설정 Card",
+      "type": "form",
+      "description": "현재 비밀번호/새 비밀번호/확인 Input + '비밀번호 변경' 버튼",
+      "uiIndex": 3
+    },
+    {
+      "id": "S11-C04",
+      "name": "알림 설정 Card",
+      "type": "form",
+      "description": "이메일/푸시/게임이벤트/시스템 알림 4개 Switch 토글",
+      "uiIndex": 4
+    },
+    {
+      "id": "S11-C05",
+      "name": "시스템 설정 Card",
+      "type": "form",
+      "description": "언어(한국어/English)/시간대 Select + 저장 버튼",
+      "uiIndex": 5
+    },
+    {
+      "id": "S11-C06",
+      "name": "프로필 PageHeader",
+      "type": "header",
+      "description": "타이틀: '프로필', 설명: '프로필 정보를 관리합니다' (/profile)",
+      "uiIndex": 6
+    },
+    {
+      "id": "S11-C07",
+      "name": "프로필 정보 Card",
+      "type": "form",
+      "description": "Avatar(h-24 w-24)/이미지 업로드/닉네임/이메일/역할(읽기전용). 보기/편집 모드 토글",
+      "uiIndex": 7
+    },
+    {
+      "id": "S11-C08",
+      "name": "계정 정보 Card",
+      "type": "display",
+      "description": "사용자 ID(font-mono)/역할 표시 (읽기 전용)",
+      "uiIndex": 8
+    }
+  ],
+  "apis": [
+    {
+      "method": "GET",
+      "path": "/admin/auth/me",
+      "description": "현재 로그인 관리자 정보 조회"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/auth/profile",
+      "description": "프로필 수정 (닉네임, 이메일, 프로필 이미지)"
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/auth/password",
+      "description": "비밀번호 변경"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/storage/upload",
+      "description": "프로필 이미지 업로드"
+    }
+  ],
+  "hooks": ["useCurrentUser()"],
+  "states": ["default", "loading", "editing", "saving"]
+}

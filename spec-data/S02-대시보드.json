@@ -1,0 +1,96 @@
+{
+  "id": "S02",
+  "name": "대시보드",
+  "route": "/dashboard",
+  "description": "BlockPick Admin 전체 현황을 한눈에 보여주는 종합 대시보드",
+  "accessRole": "ADMIN",
+  "layout": "AdminLayout",
+  "screenDesign": "docs/screen-design/11-대시보드.md",
+  "functionalSpec": "docs/functional-spec/09-대시보드.md",
+  "sourceFile": "src/app/dashboard/page.tsx",
+  "components": [
+    {
+      "id": "S02-C01",
+      "name": "PageHeader",
+      "type": "header",
+      "description": "타이틀: '대시보드', 설명: 'BlockPick 관리자 패널 개요'",
+      "uiIndex": 1
+    },
+    {
+      "id": "S02-C02",
+      "name": "통계 카드 그리드",
+      "type": "stats",
+      "description": "총 사용자/전체 게임/전체 상품/시스템 상태 4개 StatsCard (lg:grid-cols-4)",
+      "uiIndex": 2
+    },
+    {
+      "id": "S02-C03",
+      "name": "시스템 알림 Card",
+      "type": "display",
+      "description": "ActivityTimeline 형태 시스템 알림 목록. 알림 없으면 EmptyState",
+      "uiIndex": 3
+    },
+    {
+      "id": "S02-C04",
+      "name": "시스템 메트릭 Card",
+      "type": "display",
+      "description": "CPU/메모리/응답시간/업타임 수치와 Progress 바",
+      "uiIndex": 4
+    },
+    {
+      "id": "S02-C05",
+      "name": "차트 그리드",
+      "type": "chart",
+      "description": "사용자 추이/게임 활동/수익 현황/상품 현황 4개 ChartCard (Recharts LineChart)",
+      "uiIndex": 5
+    },
+    {
+      "id": "S02-C06",
+      "name": "ActivityTimeline",
+      "type": "display",
+      "description": "최근 시스템 활동 타임라인 (최대 10개)",
+      "uiIndex": 6
+    },
+    {
+      "id": "S02-C07",
+      "name": "최근 게임 목록 Card",
+      "type": "list",
+      "description": "최근 게임 목록 5개. 상태 Badge + 날짜. '전체 보기' → /games",
+      "uiIndex": 7
+    },
+    {
+      "id": "S02-C08",
+      "name": "최근 사용자 목록 Card",
+      "type": "table",
+      "description": "최근 가입 사용자 DataTable (Avatar+이름/이메일/역할/가입일/상태). '전체 보기' → /users",
+      "uiIndex": 8
+    }
+  ],
+  "apis": [
+    {
+      "method": "GET",
+      "path": "/admin/dashboard/stats",
+      "description": "대시보드 통계 (총 사용자/게임/상품/시스템 상태)"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/dashboard/charts",
+      "description": "차트 시계열 데이터"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/dashboard/activities",
+      "description": "최근 활동 목록"
+    }
+  ],
+  "hooks": [
+    "useDashboardStats()",
+    "useSystemAlerts()",
+    "useSystemMetrics()",
+    "useDashboardCharts()",
+    "useRecentActivities()",
+    "useRecentGames()",
+    "useRecentUsers()"
+  ],
+  "states": ["default", "loading"]
+}

@@ -38,6 +38,7 @@ export function useCurrentUser() {
       console.error('Auth error:', query.error);
       localStorage.removeItem('auth_token');
       localStorage.removeItem('refresh_token');
+      localStorage.removeItem('dev_mode');
       queryClient.resetQueries({ queryKey: authKeys.currentUser() });
     }
   }, [query.error, queryClient]);
@@ -79,6 +80,7 @@ export function useLogout() {
       if (typeof window !== 'undefined') {
         localStorage.removeItem('auth_token');
         localStorage.removeItem('refresh_token');
+        localStorage.removeItem('dev_mode');
       }
 
       // Clear all queries
@@ -92,6 +94,7 @@ export function useLogout() {
       if (typeof window !== 'undefined') {
         localStorage.removeItem('auth_token');
         localStorage.removeItem('refresh_token');
+        localStorage.removeItem('dev_mode');
       }
       queryClient.clear();
       queryClient.resetQueries();

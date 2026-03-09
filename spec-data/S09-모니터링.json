@@ -1,0 +1,100 @@
+{
+  "id": "S09",
+  "name": "모니터링",
+  "route": "/monitoring",
+  "description": "시스템 로그/메트릭/이벤트/트랜잭션 모니터링. 탭 기반 UI (UI 미구현)",
+  "accessRole": "ADMIN",
+  "layout": "AdminLayout",
+  "screenDesign": "docs/screen-design/17-모니터링.md",
+  "functionalSpec": "docs/functional-spec/07-시스템-모니터링.md",
+  "sourceFile": "src/app/monitoring/page.tsx",
+  "implementationStatus": "UI 미구현 (백엔드 API 존재)",
+  "components": [
+    {
+      "id": "S09-C01",
+      "name": "PageHeader",
+      "type": "header",
+      "description": "타이틀: '모니터링', 설명: '시스템 로그와 메트릭을 모니터링합니다'",
+      "uiIndex": 1
+    },
+    {
+      "id": "S09-C02",
+      "name": "통계 카드 그리드",
+      "type": "stats",
+      "description": "총 로그/오류 로그/경고 로그/미발행 이벤트 4개 StatsCard",
+      "uiIndex": 2
+    },
+    {
+      "id": "S09-C03",
+      "name": "Tabs 내비게이션",
+      "type": "navigation",
+      "description": "로그/메트릭/이벤트/트랜잭션 4개 탭 (defaultValue='logs')",
+      "uiIndex": 3
+    },
+    {
+      "id": "S09-C04",
+      "name": "로그 탭 콘텐츠",
+      "type": "tab-content",
+      "description": "로그 레벨/서비스 필터 + DataTable (레벨/서비스/메시지/시간/상세). 30초 자동 갱신",
+      "uiIndex": 4
+    },
+    {
+      "id": "S09-C05",
+      "name": "메트릭 탭 콘텐츠",
+      "type": "tab-content",
+      "description": "CPU/메모리/요청수 ChartCard 3개 세로 배치. 기간 선택(일/주/월/년). 10초 자동 갱신",
+      "uiIndex": 5
+    },
+    {
+      "id": "S09-C06",
+      "name": "이벤트 탭 콘텐츠",
+      "type": "tab-content",
+      "description": "미발행 이벤트 DataTable (이벤트ID/타입/페이로드/생성일/재시도횟수/수동발행 버튼)",
+      "uiIndex": 6
+    },
+    {
+      "id": "S09-C07",
+      "name": "트랜잭션 탭 콘텐츠",
+      "type": "tab-content",
+      "description": "실패 트랜잭션 DataTable (TX해시/타입/오류메시지/발생시각/재시도 버튼)",
+      "uiIndex": 7
+    }
+  ],
+  "apis": [
+    {
+      "method": "GET",
+      "path": "/admin/monitoring/stats",
+      "description": "모니터링 통계"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/monitoring/logs",
+      "description": "시스템 로그 목록 (레벨/서비스 필터, 페이지네이션)"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/monitoring/metrics",
+      "description": "시스템 메트릭 시계열 데이터"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/monitoring/events/unpublished",
+      "description": "미발행 이벤트 목록"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/monitoring/transactions/failed",
+      "description": "실패 트랜잭션 목록"
+    }
+  ],
+  "hooks": [
+    "useMonitoringStats()",
+    "useLogs(level, service, pagination)",
+    "useSystemMetrics(period)",
+    "useUnpublishedEvents()",
+    "useFailedTransactions()",
+    "usePublishEvent()",
+    "useRetryTransaction()"
+  ],
+  "states": ["default", "loading", "tab-logs", "tab-metrics", "tab-events", "tab-transactions"]
+}

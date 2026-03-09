@@ -1,0 +1,107 @@
+{
+  "id": "S05",
+  "name": "게임 상품 관리",
+  "route": "/games/[id]/products",
+  "description": "특정 게임에 연결된 상품 관리. 그랜드 프라이즈 설정 및 지역 설정",
+  "accessRole": "ADMIN",
+  "layout": "AdminLayout",
+  "screenDesign": "docs/screen-design/14-게임-상품.md",
+  "functionalSpec": "docs/functional-spec/05-게임상품-통합.md",
+  "sourceFile": "src/app/games/[id]/products/page.tsx",
+  "routeParams": {
+    "id": "게임 ID"
+  },
+  "components": [
+    {
+      "id": "S05-C01",
+      "name": "뒤로가기 버튼",
+      "type": "navigation",
+      "description": "ArrowLeft 아이콘 버튼 → router.push('/games')",
+      "uiIndex": 1
+    },
+    {
+      "id": "S05-C02",
+      "name": "PageHeader",
+      "type": "header",
+      "description": "타이틀: '{game.title} - 상품 관리'. action: '상품 추가' → LinkProductToGameDialog",
+      "uiIndex": 2
+    },
+    {
+      "id": "S05-C03",
+      "name": "통계 카드 그리드",
+      "type": "stats",
+      "description": "총 상품 수/그랜드 프라이즈/지역 수 3개 StatsCard (md:grid-cols-3)",
+      "uiIndex": 3
+    },
+    {
+      "id": "S05-C04",
+      "name": "상품 카드 그리드",
+      "type": "grid",
+      "description": "연결된 상품을 Card 형태로 표시 (lg:grid-cols-3). 이미지/상품명/브랜드/수량/지역 Badge",
+      "uiIndex": 4
+    },
+    {
+      "id": "S05-C05",
+      "name": "상품 Card DropdownMenu",
+      "type": "action",
+      "description": "그랜드 프라이즈 설정/해제, 지역 설정(미구현), 상품 제거",
+      "uiIndex": 5
+    },
+    {
+      "id": "S05-C06",
+      "name": "LinkProductToGameDialog",
+      "type": "dialog",
+      "description": "게임에 상품 연결 다이얼로그 (상품 검색 + 체크박스 선택)",
+      "uiIndex": 6
+    },
+    {
+      "id": "S05-C07",
+      "name": "ConfirmDialog",
+      "type": "dialog",
+      "description": "상품 제거 확인 다이얼로그 (destructive)",
+      "uiIndex": 7
+    },
+    {
+      "id": "S05-C08",
+      "name": "EmptyState",
+      "type": "feedback",
+      "description": "연결된 상품 없을 때 표시. '상품 추가' CTA 포함",
+      "uiIndex": 8
+    }
+  ],
+  "apis": [
+    {
+      "method": "GET",
+      "path": "/admin/games/{id}",
+      "description": "게임 기본 정보 조회"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/games/{id}/products",
+      "description": "게임에 연결된 전체 상품 목록"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/games/{id}/products",
+      "description": "게임에 상품 연결"
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/games/{id}/products/{productId}",
+      "description": "게임에서 상품 제거"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/games/{id}/grand-prizes",
+      "description": "그랜드 프라이즈 일괄 설정"
+    }
+  ],
+  "hooks": [
+    "useGame(gameId)",
+    "useCompleteGameProducts(gameId)",
+    "useGameProductStats(gameId)",
+    "useDeleteGameProduct()",
+    "useSetGrandPrizes()"
+  ],
+  "states": ["default", "loading", "empty", "game-not-found"]
+}

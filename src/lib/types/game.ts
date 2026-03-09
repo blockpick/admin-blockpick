@@ -4,7 +4,7 @@
 
 import { GameProductDto } from './game-product';
 
-export type GameType = 'DAILY' | 'SELECT' | 'VIBE';
+export type GameType = 'DAILY' | 'SELECT' | 'VIBE' | 'PRIME';
 export type Currency = 'CASH' | 'POINT';
 
 // GameStatus type for API responses
@@ -58,6 +58,8 @@ export interface GameDto {
   updatedAt: string;
   gameProducts?: GameProductDto[];
   gameType: GameType;
+  // 즉시 당첨 기능 포함 여부 (스펙 추가 필드)
+  hasInstantPrize?: boolean;
 }
 
 // Legacy interface for backward compatibility
@@ -161,6 +163,8 @@ export interface GameFilterParams {
   title?: string;
 }
 
+// 게임 통계 타입 (스펙 기준 구체화)
 export interface GameStats {
-  [key: string]: unknown; // Stats structure varies
+  statusStats: Record<string, number>;
+  typeStats: Record<string, number>;
 }
